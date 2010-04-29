@@ -85,4 +85,25 @@ GAMEMATH_INLINE float Vector4::dot(const Vector4 &vector) const
 	return _get_lower_register(dotProduct);
 }
 
+GAMEMATH_INLINE Vector4 Vector4::cross(const Vector4 &vector) const
+{
+	Vector4 result;
+
+	// Desired result: a2*b3 - a3*b2, a3*b1 - a1*b3, a1*b2 - a2*b1, a4*a4-b4*b4
+
+	// First step: a2*b3, a3*b1, a1*b2, a4*b4
+	__m128 left = _mm_shuffle_ps(mSse, mSse, _MM_SHUFFLE(3, 0, 2, 1));
+	__m128 right = _mm_shuffle_ps(vector.mSse, vector.mSse, _MM_SHUFFLE(3, 1, 0, 2));
+		
+	result.mSse = _mm_mul_ps(left, right);
+
+	// Second step: a3*b2, a1*b3, a2*b1, a4*b4
+	left = _mm_shuffle_ps(mSse, mSse, _MM_SHUFFLE(3, 1, 0, 2));
+	right = _mm_shuffle_ps(vector.mSse, vector.mSse, _MM_SHUFFLE(3, 0, 2, 1));
+
+	result.mSse = _mm_sub_ps(result.mSse, _mm_mul_ps(left, right));
+
+	return result;
+}
+
 GAMEMATH_NAMESPACE_END
