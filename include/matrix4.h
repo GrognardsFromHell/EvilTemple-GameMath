@@ -35,12 +35,12 @@ private:
 #endif
 };
 
+GAMEMATH_NAMESPACE_END
+
 #if !defined(GAMEMATH_NO_INTRINSICS)
 #include "matrix4_sse.h"
 #else
 #include "matrix4_sisd.h"
 #endif
-
-GAMEMATH_NAMESPACE_END
 
 #endif // MATRIX4_H

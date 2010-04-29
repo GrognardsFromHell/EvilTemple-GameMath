@@ -106,4 +106,40 @@ GAMEMATH_INLINE Vector4 Vector4::cross(const Vector4 &vector) const
 	return result;
 }
 
+Vector4 &Vector4::operator +(const Vector4 &vector)
+{
+	mSse = _mm_add_ps(mSse, vector.mSse);
+	return *this;
+}
+
+Vector4 &Vector4::operator -(const Vector4 &vector)
+{
+	mSse = _mm_sub_ps(mSse, vector.mSse);
+	return *this;
+}
+
+GAMEMATH_INLINE Vector4 operator +(const Vector4 &a, const Vector4 &b)
+{
+	Vector4 result;
+	result.mSse = _mm_add_ps(a.mSse, b.mSse);
+	return result;
+}
+
+GAMEMATH_INLINE Vector4 operator -(const Vector4 &a, const Vector4 &b)
+{
+	Vector4 result;
+	result.mSse = _mm_sub_ps(a.mSse, b.mSse);
+	return result;
+}
+
+/**
+  * Returns a negated version of this vector.
+  */
+GAMEMATH_INLINE Vector4 Vector4::operator -() const
+{
+	Vector4 result;
+	result.mSse = _mm_xor_ps(mSse, *reinterpret_cast<const __m128*>(&SignMask));
+	return result;
+}
+
 GAMEMATH_NAMESPACE_END

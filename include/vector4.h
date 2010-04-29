@@ -8,6 +8,8 @@ GAMEMATH_NAMESPACE_BEGIN
 GAMEMATH_ALIGN class Vector4
 {
 friend class Matrix4;
+friend Vector4 operator +(const Vector4 &a, const Vector4 &b);
+friend Vector4 operator -(const Vector4 &a, const Vector4 &b);
 public:
 	Vector4();
 	Vector4(const float x, const float y, const float z, const float w);
@@ -72,6 +74,21 @@ public:
 	 * @return this x vector
 	 */
 	Vector4 cross(const Vector4 &vector) const;
+
+	/**
+	 * Adds another vector to this vector.
+	 */
+	Vector4 &operator +(const Vector4 &vector);
+
+	/**
+	 * Subtracts another vector from this vector.
+	 */
+	Vector4 &operator -(const Vector4 &vector);
+
+	/**
+	 * Returns a negated version of this vector.
+	 */
+	Vector4 operator -() const;
 
 private:
 #if !defined(GAMEMATH_NO_INTRINSICS)
