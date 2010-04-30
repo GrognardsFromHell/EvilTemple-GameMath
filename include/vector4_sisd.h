@@ -29,7 +29,7 @@ GAMEMATH_INLINE float Vector4::lengthSquared() const
 	return dot(*this);
 }
 
-GAMEMATH_INLINE void Vector4::normalize()
+GAMEMATH_INLINE Vector4 &Vector4::normalize()
 {
 	const float reciprocalLength = 1 / length();
 	
@@ -37,6 +37,14 @@ GAMEMATH_INLINE void Vector4::normalize()
 	mY *= reciprocalLength;
 	mZ *= reciprocalLength;
 	mW *= reciprocalLength;
+
+	return *this;
+}
+
+GAMEMATH_INLINE Vector4 &Vector4::normalizeEstimated()
+{
+	// Currently no estimated implementation
+	return normalize();
 }
 
 GAMEMATH_INLINE Vector4 Vector4::normalized() const
@@ -59,6 +67,43 @@ GAMEMATH_INLINE Vector4 Vector4::cross(const Vector4 &vector) const
 	result.mW = 0;
 
 	return result;
+}
+
+
+GAMEMATH_INLINE Vector4 &Vector4::operator +(const Vector4 &vector)
+{
+	mX += vector.mX;
+	mY += vector.mY;
+	mZ += vector.mZ;
+	mW += vector.mW;
+	return *this;
+}
+
+GAMEMATH_INLINE Vector4 &Vector4::operator -(const Vector4 &vector)
+{
+	mX -= vector.mX;
+	mY -= vector.mY;
+	mZ -= vector.mZ;
+	mW -= vector.mW;
+	return *this;
+}
+
+GAMEMATH_INLINE Vector4 operator +(const Vector4 &a, const Vector4 &b)
+{
+	return Vector4(a.mX - b.mX, a.mY - b.mY, a.mZ - b.mZ, a.mW - b.mW);
+}
+
+GAMEMATH_INLINE Vector4 operator -(const Vector4 &a, const Vector4 &b)
+{
+	return Vector4(a.mX - b.mX, a.mY - b.mY, a.mZ - b.mZ, a.mW - b.mW);
+}
+
+/**
+  * Returns a negated version of this vector.
+  */
+GAMEMATH_INLINE Vector4 Vector4::operator -() const
+{
+	return Vector4(-mX, -mY, -mZ, -mW);
 }
 
 GAMEMATH_NAMESPACE_END

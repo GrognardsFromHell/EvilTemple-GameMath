@@ -1,11 +1,9 @@
 
-#include "../../include/gamemath.h"
+#define GAMEMATH_NO_INTRINSICS
+#include "../common/common.h"
 
 #include <limits>
 #include <cstdio>
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
 using namespace GameMath;
 
@@ -17,37 +15,21 @@ int main(int argc, char *argv[])
 
 	printf("%f %f %f %f\n", vec.x(), vec.y(), vec.z(), vec.w());
 
-	printf("Length Squared: %f.\n", vec.lengthSquared());
-	printf("Length: %f.\n", vec.length());
+	COMPARE(vec.lengthSquared(), 30);
+	COMPARE(vec.length(), std::sqrtf(30));
 
 	vec.normalize();
-	printf("%f %f %f %f\n", vec.x(), vec.y(), vec.z(), vec.w());
+	COMPARE(vec.lengthSquared(), 1);
+	COMPARE(vec.length(), 1);
 
-	double totalElapsed = 0;
-	const int totalRuns = 10000;
-
-	for (int j = 0; j < totalRuns; ++j) {
-		LARGE_INTEGER start, end;
-		QueryPerformanceCounter(&start);
-
+	BENCHMARK("Vector cross product & normalization") {
 		for (int i = 0; i < 10000; ++i) {
 			Vector4 a(0, 0, 1, 0);
 			Vector4 b(0, 1, 0, 0);
-			result[i] = b.cross(a);
+			result[i] = b.cross(a).normalize();
 		}
-
-		QueryPerformanceCounter(&end);
-
-		double elapsed = (double)(end.QuadPart - start.QuadPart);
-
-		LARGE_INTEGER frequency;
-		QueryPerformanceFrequency(&frequency);
-
-		totalElapsed += elapsed / (double)frequency.QuadPart;
 	}
-
-	printf("Elapsed ms: %Lf\n", (double)(totalElapsed * 1000 / (double)totalRuns));
-
+	
 	Vector4 c = - result[0];
 	printf("%f %f %f %f\n", c.x(), c.y(), c.z(), c.w());
 

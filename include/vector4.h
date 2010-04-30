@@ -8,8 +8,8 @@ GAMEMATH_NAMESPACE_BEGIN
 GAMEMATH_ALIGN class Vector4
 {
 friend class Matrix4;
-friend Vector4 operator +(const Vector4 &a, const Vector4 &b);
-friend Vector4 operator -(const Vector4 &a, const Vector4 &b);
+friend GAMEMATH_INLINE Vector4 operator +(const Vector4 &a, const Vector4 &b);
+friend GAMEMATH_INLINE Vector4 operator -(const Vector4 &a, const Vector4 &b);
 public:
 	Vector4();
 	Vector4(const float x, const float y, const float z, const float w);
@@ -49,13 +49,13 @@ public:
 	/**
 	 * Normalizes this vector by dividing its components by this vectors length.
 	 */
-	void normalize();
+	Vector4 &normalize();
 
 	/**
 	 * Normalizes using a reciprocal square root, which only has 11-bit precision. Use this if the
 	 * result doesn't need to be very precisely normalized.
 	 */
-	void normalizeEstimated();
+	Vector4 &normalizeEstimated();
 
 	/**
 	 * Normalizes this vector and returns it in a new object, while leaving this object untouched.

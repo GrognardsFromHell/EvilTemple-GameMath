@@ -43,6 +43,11 @@ inline void operator delete(void *ptr)
 	ALIGNED_FREE(ptr);
 }
 
+GAMEMATH_NAMESPACE_BEGIN
+class Vector4;
+class Matrix4;
+GAMEMATH_NAMESPACE_END
+
 #include "gamemath_constants.h"
 #include "vector4.h"
 #include "matrix4.h"

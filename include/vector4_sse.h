@@ -59,18 +59,40 @@ GAMEMATH_INLINE float Vector4::lengthSquared() const
 	return dot(*this);
 }
 
-GAMEMATH_INLINE void Vector4::normalize()
+GAMEMATH_INLINE Vector4 &Vector4::normalize()
 {
 	__m128 length = _dot_product(mSse, mSse);
+
+	// Then take the square root of the lowest vector component
+	length = _mm_sqrt_ss(length);
 
 	// Splat the length into each vector component
 	length = _mm_shuffle_ps(length, length, _MM_SHUFFLE(0, 0, 0, 0));
 
-	// Then take the square root of each vector component
-	length = _mm_sqrt_ps(length);
-
 	// The last normalization step is dividing each component of this vector, by its length
 	mSse = _mm_div_ps(mSse, length);
+
+	// TODO: What to do for nearly length0 vectors
+
+	return *this;
+}
+
+GAMEMATH_INLINE Vector4 &Vector4::normalizeEstimated()
+{
+	__m128 length = _dot_product(mSse, mSse);
+
+	// Then take the square root of each vector component
+	length = _mm_rsqrt_ss(length);
+
+	// Splat the length into each vector component
+	length = _mm_shuffle_ps(length, length, _MM_SHUFFLE(0, 0, 0, 0));
+
+	// The last normalization step is dividing each component of this vector, by its length
+	mSse = _mm_mul_ps(mSse, length);
+
+	// TODO: What to do for nearly length0 vectors
+
+	return *this;
 }
 
 GAMEMATH_INLINE Vector4 Vector4::normalized() const
@@ -106,13 +128,13 @@ GAMEMATH_INLINE Vector4 Vector4::cross(const Vector4 &vector) const
 	return result;
 }
 
-Vector4 &Vector4::operator +(const Vector4 &vector)
+GAMEMATH_INLINE Vector4 &Vector4::operator +(const Vector4 &vector)
 {
 	mSse = _mm_add_ps(mSse, vector.mSse);
 	return *this;
 }
 
-Vector4 &Vector4::operator -(const Vector4 &vector)
+GAMEMATH_INLINE Vector4 &Vector4::operator -(const Vector4 &vector)
 {
 	mSse = _mm_sub_ps(mSse, vector.mSse);
 	return *this;
@@ -132,9 +154,6 @@ GAMEMATH_INLINE Vector4 operator -(const Vector4 &a, const Vector4 &b)
 	return result;
 }
 
-/**
-  * Returns a negated version of this vector.
-  */
 GAMEMATH_INLINE Vector4 Vector4::operator -() const
 {
 	Vector4 result;

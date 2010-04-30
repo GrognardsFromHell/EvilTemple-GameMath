@@ -7,21 +7,81 @@
 
 GAMEMATH_NAMESPACE_BEGIN
 
-GAMEMATH_ALIGN static const float IdentityCol1[4] = {1, 0, 0, 0};
-GAMEMATH_ALIGN static const float IdentityCol2[4] = {1, 0, 0, 0};
-GAMEMATH_ALIGN static const float IdentityCol3[4] = {1, 0, 0, 0};
-GAMEMATH_ALIGN static const float IdentityCol4[4] = {1, 0, 0, 0};
-
 GAMEMATH_ALIGN class Matrix4 {
 public:
+	/**
+	 * Sets this matrix to the identity matrix.
+	 */
 	void setToIdentity();
+	
+	/**
+	 * Sets every element of this matrix to zero.
+	 */
+	void setToZero();
 
+	/**
+	 * Returns the internal data of this matrix as a column-major array of 16 floating point values.
+	 *
+	 * This can be used to upload the matrix efficiently to OpenGL.
+	 *
+	 * @return A pointer to the constant internal data of this matrix.
+	 */
 	const float *data() const;
 
-	float operator()(int,int) const;
+	/**
+	 * Returns the internal data of this matrix as a column-major array of 16 floating point values.
+	 *
+	 * This can be used to upload the matrix efficiently to OpenGL, or read the matrix directly from a file,
+	 * if the endian-ness matches.
+	 *
+	 * @return A pointer to the constant internal data of this matrix.
+	 */
+	float *data();
+	
+	/**
+	 * Returns a single element of this matrix.
+	 */
+	float operator()(int row,int col) const;
 
+	/**
+	 * Returns a reference to a single element of this matrix.
+	 */
+	float &operator()(int row, int col);
+
+	/**
+	 * Multiplies this matrix with a scaling matrix and returns a reference to this matrix.
+	 *
+	 * @param vector A vector containing the scaling factors for each component.
+	 *
+	 * @return A reference to this matrix.
+	 */
 	Matrix4 &scale(const Vector4 &vector);
+	
+	/**
+	 * Creates a 3D scaling matrix from a vector.
+	 * @param vector The x, y, and z components of this vector are used as elements (0,0), (1,1) and (2,2) of the
+	 * resulting matrix.
+	 */
+	static Matrix4 scaling(const Vector4 &vector);
+
+	/**
+	 * Creates a 3D scaling matrix from individual scaling factors.
+	 */
+	static Matrix4 scaling(const float sx, const float sy, const float sz);
+
+	/**
+	 * Multiplies this scaling matrix with a scaling matrix for the x, y, and z components.
+
+	 * @return A reference to this matrix.
+	 */
 	Matrix4 &scale(const float sx, const float sy, const float sz);
+
+	/**
+	 * Multiplies this matrix with a vector and returns the resulting vector.
+	 *
+	 * No coordinate homogenization is performed after the multiplication.
+	 */
+	Vector4 operator *(const Vector4 &vector) const;
 
 	void print() const;
 private:
@@ -34,6 +94,26 @@ private:
 	float m[4][4];
 #endif
 };
+
+GAMEMATH_INLINE const float *Matrix4::data() const
+{
+	return &m[0][0];
+}
+
+GAMEMATH_INLINE float *Matrix4::data()
+{
+	return &m[0][0];
+}
+
+GAMEMATH_INLINE float Matrix4::operator()(int row, int col) const
+{
+	return m[col][row];
+}
+
+GAMEMATH_INLINE float &Matrix4::operator()(int row, int col)
+{
+	return m[col][row];
+}
 
 GAMEMATH_NAMESPACE_END
 
