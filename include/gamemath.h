@@ -50,6 +50,7 @@ GAMEMATH_NAMESPACE_END
 
 #include "gamemath_constants.h"
 #include "vector4.h"
+#include "quaternion.h"
 #include "matrix4.h"
 
 #endif // GAMEMATH_H

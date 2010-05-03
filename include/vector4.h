@@ -90,6 +90,10 @@ public:
 	 */
 	Vector4 operator -() const;
 
+	const float *data() const;
+
+	float *data();
+
 private:
 #if !defined(GAMEMATH_NO_INTRINSICS)
 	union {
@@ -127,6 +131,16 @@ GAMEMATH_INLINE float Vector4::z() const
 GAMEMATH_INLINE float Vector4::w() const 
 {
 	return mW;
+}
+
+GAMEMATH_INLINE const float *Vector4::data() const
+{
+	return &mX;
+}
+
+GAMEMATH_INLINE float *Vector4::data()
+{
+	return &mX;
 }
 
 GAMEMATH_NAMESPACE_END

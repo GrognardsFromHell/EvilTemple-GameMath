@@ -70,6 +70,16 @@ public:
 	static Matrix4 scaling(const float sx, const float sy, const float sz);
 
 	/**
+	 * Creates a transformation matrix that will perform scaling, rotation and translation (in that order).
+	 * 
+	 * @param scale The x, y, and z components of this vector will be used as the scaling factors.
+	 * @param rotation This rotation will be performed by the resulting matrix.
+	 * @param translation The x, y, and z components of this vector will be used as the translation in the resulting
+	 *					matrix.
+	 */
+	static Matrix4 transformation(const Vector4 &scale, const Quaternion &rotation, const Vector4 &translation);
+
+	/**
 	 * Multiplies this scaling matrix with a scaling matrix for the x, y, and z components.
 
 	 * @return A reference to this matrix.
@@ -82,6 +92,19 @@ public:
 	 * No coordinate homogenization is performed after the multiplication.
 	 */
 	Vector4 operator *(const Vector4 &vector) const;
+
+	/**
+	 * Transforms a position vector by this matrix. Practically, the vector's fourth component is
+	 * assumed to be 1, leading to this matrices fourth column being added to the resulting vector
+	 * without requiring a multiplication.
+	 */
+	Vector4 mapPosition(const Vector4 &vector) const;
+
+	/**
+	 * Transforms a normal vector by this matrix. Practically, the vector's fourth component is
+	 * assumed to be 0, so the fourth column of this matrix doesn't need to be multiplied with the vector.
+	 */
+	Vector4 mapNormal(const Vector4 &vector) const;
 
 	void print() const;
 private:

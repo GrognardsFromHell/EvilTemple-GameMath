@@ -1,7 +1,17 @@
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#include <time.h>
+
 #include "../common/common.h"
 
 using namespace GameMath;
+
+static Vector4 positionIn[10000];
+static Vector4 normalIn[10000];
+static Vector4 positionOut[10000];
+static Vector4 normalOut[10000];
 
 int main(int argc, char *argv[])
 {
@@ -10,7 +20,30 @@ int main(int argc, char *argv[])
 	Vector4 v(1, 2, 3, 4);
 	Vector4 c = m * v;
 
+	srand(time(NULL));
+	for (int i = 0; i < 10000; ++i) {
+		positionIn[i] = Vector4(rand(), rand(), rand(), rand());
+		normalIn[i] = Vector4(rand(), rand(), rand(), rand()).normalize();
+	}
+
 	printVector(c);
+	
+	BENCHMARK("Iterate over 10000 vectors and multiply them with a matrix.") {		
+		for (int i = 0; i < 10000; ++i) {
+			positionOut[i] = m.mapPosition(positionIn[i]);
+			normalOut[i] = m.mapNormal(normalIn[i]);
+		}
+	}
+
+	Quaternion rotation = Quaternion::fromAxisAndAngle(0, 1, 0, (float)M_PI_2); // rotation of 90° around the Y axis
+
+	Matrix4 boneMatrix = Matrix4::transformation(Vector4(2, 3, 4, 0), rotation, Vector4(10, 20, 30, 0));
+
+	Vector4 result = boneMatrix * Vector4(1, 0, 0, 1);
+	COMPARE(result.x(), 10);
+	COMPARE(result.y(), 20);
+	COMPARE(result.z(), 32);
+	COMPARE(result.w(), 1);
 
 	printf("Press enter to continue.\n");
 	fgetc(stdin);
