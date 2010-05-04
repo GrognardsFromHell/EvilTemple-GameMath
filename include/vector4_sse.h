@@ -128,7 +128,7 @@ GAMEMATH_INLINE Vector4 Vector4::cross(const Vector4 &vector) const
 	return result;
 }
 
-GAMEMATH_INLINE Vector4 &Vector4::operator +(const Vector4 &vector)
+GAMEMATH_INLINE Vector4 &Vector4::operator +=(const Vector4 &vector)
 {
 	mSse = _mm_add_ps(mSse, vector.mSse);
 	return *this;
@@ -157,8 +157,31 @@ GAMEMATH_INLINE Vector4 operator -(const Vector4 &a, const Vector4 &b)
 GAMEMATH_INLINE Vector4 Vector4::operator -() const
 {
 	Vector4 result;
-	result.mSse = _mm_xor_ps(mSse, *reinterpret_cast<const __m128*>(&SignMask));
+	result.mSse = _mm_xor_ps(mSse, *reinterpret_cast<const __m128*>(&SignMaskXYZ));
 	return result;
+}
+
+GAMEMATH_INLINE Vector4 operator *(const float factor, const Vector4 &vector)
+{
+	__m128 factorVector = _mm_set_ps(1, factor, factor, factor);
+	Vector4 result;
+	result.mSse = _mm_mul_ps(vector.mSse, factorVector);
+	return result;
+}
+
+GAMEMATH_INLINE Vector4 operator *(const Vector4 &vector, const float factor)
+{
+	__m128 factorVector = _mm_set_ps(1, factor, factor, factor);
+	Vector4 result;
+	result.mSse = _mm_mul_ps(vector.mSse, factorVector);
+	return result;
+}
+
+GAMEMATH_INLINE Vector4 &Vector4::operator *=(const float factor)
+{
+	__m128 factorVector = _mm_set_ps(1, factor, factor, factor);
+	mSse = _mm_mul_ps(mSse, factorVector);
+	return *this;
 }
 
 GAMEMATH_NAMESPACE_END

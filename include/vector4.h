@@ -10,6 +10,8 @@ GAMEMATH_ALIGN class Vector4
 friend class Matrix4;
 friend GAMEMATH_INLINE Vector4 operator +(const Vector4 &a, const Vector4 &b);
 friend GAMEMATH_INLINE Vector4 operator -(const Vector4 &a, const Vector4 &b);
+friend GAMEMATH_INLINE Vector4 operator *(const float, const Vector4 &vector);
+friend GAMEMATH_INLINE Vector4 operator *(const Vector4 &vector, const float);
 public:
 	Vector4();
 	Vector4(const float x, const float y, const float z, const float w);
@@ -78,7 +80,13 @@ public:
 	/**
 	 * Adds another vector to this vector.
 	 */
-	Vector4 &operator +(const Vector4 &vector);
+	Vector4 &operator +=(const Vector4 &vector);
+
+	/**
+	 * Multiplies this vector with a scalar factor.
+	 * Only the x,y, and z components of the vector are multiplied.
+	 */
+	Vector4 &operator *=(const float factor);
 
 	/**
 	 * Subtracts another vector from this vector.
@@ -86,7 +94,7 @@ public:
 	Vector4 &operator -(const Vector4 &vector);
 
 	/**
-	 * Returns a negated version of this vector.
+	 * Returns a negated version of this vector, negating only the x, y, and z components.
 	 */
 	Vector4 operator -() const;
 

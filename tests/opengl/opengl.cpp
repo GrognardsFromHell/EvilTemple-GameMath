@@ -34,7 +34,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	HDC drawingContext = GetDC(windowHandle);
 	HGLRC glContext = StartOpenGL(drawingContext);
 
-	CreateScene();
+	if (!CreateScene()) {
+		MessageBox(windowHandle, L"Unable to create OpenGL scene.", L"Error", MB_OK|MB_ICONERROR);
+		DestroyWindow(windowHandle);
+		return -1;
+	}
 	
 	double startTime = GetTime();
 

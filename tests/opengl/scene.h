@@ -2,7 +2,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-void CreateScene();
+bool CreateScene();
 void DestroyScene();
 void DrawScene(double secondsElapsed);
 

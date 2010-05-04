@@ -30,7 +30,7 @@
 #endif
 
 // Override new and delete to force 16-byte alignment on all platforms
-inline void* operator new(size_t size)
+GAMEMATH_INLINE void* operator new(size_t size)
 {
 	void *result = ALIGNED_MALLOC(size);
 	if (!result)
@@ -38,7 +38,20 @@ inline void* operator new(size_t size)
 	return result;
 }
 
-inline void operator delete(void *ptr)
+GAMEMATH_INLINE void operator delete(void *ptr)
+{
+	ALIGNED_FREE(ptr);
+}
+
+GAMEMATH_INLINE void* operator new[](size_t size)
+{
+	void *result = ALIGNED_MALLOC(size);
+	if (!result)
+		throw std::bad_alloc();
+	return result;
+}
+
+GAMEMATH_INLINE void operator delete[](void *ptr)
 {
 	ALIGNED_FREE(ptr);
 }

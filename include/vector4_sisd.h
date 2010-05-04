@@ -70,7 +70,7 @@ GAMEMATH_INLINE Vector4 Vector4::cross(const Vector4 &vector) const
 }
 
 
-GAMEMATH_INLINE Vector4 &Vector4::operator +(const Vector4 &vector)
+GAMEMATH_INLINE Vector4 &Vector4::operator +=(const Vector4 &vector)
 {
 	mX += vector.mX;
 	mY += vector.mY;

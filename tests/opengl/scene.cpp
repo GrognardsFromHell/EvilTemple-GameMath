@@ -1,7 +1,10 @@
 
 #include <windows.h>
+#include <gl/glew.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
+
+#include "model.h"
 
 #include "../../include/gamemath.h"
 using namespace GameMath;
@@ -41,8 +44,28 @@ static int faces[] = {
 };
 static int faceCount = sizeof(faces) / sizeof(int) / 4;
 
-void CreateScene()
+Model model;
+
+bool CreateScene()
 {
+	GLenum err = glewInit();
+
+	if (GLEW_OK != err) {
+		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+		return false;
+	}
+
+	if (!GLEW_VERSION_2_0) {
+		fprintf(stderr, "Error: OpenGL 2.0 required.");
+		return false;
+	}
+	
+	if (!model.open("test.model")) {
+		return false;
+	}
+	model.close();
+	model.open("test.model");
+
 	glEnable(GL_DEPTH_TEST); // Use Z-Buffer & depth testing
 	glEnable(GL_CULL_FACE);
 
@@ -58,23 +81,28 @@ void CreateScene()
 	glEnable(GL_LIGHTING);
 
 	// Enable diffuse lighting
-	const GLfloat diffuseColor[] = {1, 1, 1, 1};
+	const GLfloat diffuseColor[] = {0.9, 0.9, 0.9, 1};
 	const GLfloat diffuseDirection[] = {0, 0.89, 0.447, 0};
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseColor);
 	glLightfv(GL_LIGHT0, GL_POSITION, diffuseDirection);
 	glEnable(GL_LIGHT0);
 	
 	// Set global ambient light color
-	GLfloat globalAmbient[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	GLfloat globalAmbient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
 	
 	sphere = gluNewQuadric();
 
 	glDisable(GL_COLOR_MATERIAL);
+
+	glEnable(GL_SMOOTH);
+
+	return true;
 }
 
 void DestroyScene()
 {
+	model.close();
 	gluDeleteQuadric(sphere);
 }
 
@@ -111,7 +139,7 @@ void DrawScene(double secondsElapsed)
 	}
 	glEnd();
 	glPopMatrix();
-	
+		
 	// Draw earth
 	glPushMatrix();
 	glRotatef(angle, 0, 1, 0);
@@ -123,4 +151,29 @@ void DrawScene(double secondsElapsed)
 	//glPushMatrix();
 	//gluSphere(sphere, 3, 100, 100);
 	//glPopMatrix();
+
+	glPushMatrix();
+	glRotatef(angle, 0, 1, 0);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, model.positionBuffer);
+	glVertexPointer(4, GL_FLOAT, 0, 0);
+
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, model.normalBuffer);
+	glNormalPointer(GL_FLOAT, sizeof(float) * 4, 0);
+
+	for (int i = 0; i < model.faces; ++i) {
+		const FaceGroup &faceGroup = model.faceGroups[i];
+
+		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, faceGroup.buffer);
+		glDrawElements(GL_TRIANGLES, faceGroup.elementCount, GL_UNSIGNED_SHORT, 0);
+	}
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glPopMatrix();
 }
