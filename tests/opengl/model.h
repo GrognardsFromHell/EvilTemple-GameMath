@@ -6,10 +6,15 @@
 
 #include <gl/glew.h>
 
+#include "materialstate.h"
+#include "renderstate.h"
+
+#include <QtCore/QString>
+
 using namespace GameMath;
 
 struct FaceGroup {
-	uint materialId;
+	MaterialState *material;
 	uint elementCount;
 	GLuint buffer;
 	
@@ -22,7 +27,7 @@ public:
 	Model();
 	~Model();
 
-	bool open(const char *filename);
+	bool open(const char *filename, const RenderStates &renderState);
 	void close();
 
 	Vector4 *positions;
@@ -39,13 +44,25 @@ public:
 
 	void drawNormals() const;
 
+	const QString &error() const;
+
 private:
 	// Those two pointers are actually freed, the others just point into these two
+	MaterialState *materialState;
+	
 	void *vertexData;
 	void *faceData;
+	void *textureData;
 	
 	void loadVertexData();
 	void loadFaceData();
+
+	QString mError;
 };
+
+inline const QString &Model::error() const
+{
+	return mError;
+}
 
 #endif

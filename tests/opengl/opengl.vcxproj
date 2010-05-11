@@ -39,9 +39,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Qt\4.7.0-beta1\include\;..\..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\4.7.0-beta1\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Qt\4.7.0-beta1\src\corelib;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Qt\4.7.0-beta1\include\;../../include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\4.7.0-beta1\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Qt\4.7.0-beta1\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -55,7 +61,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;QtCored4.lib;QtGuid4.lib;QtXmld4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>glew-1.5.4\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -75,18 +81,44 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;QtCore4.lib;QtGui4.lib;QtXml4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>glew-1.5.4\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GLSLProgram.cpp" />
+    <ClCompile Include="material.cpp" />
+    <ClCompile Include="materialstate.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="opengl.cpp" />
+    <ClCompile Include="renderstates.cpp" />
     <ClCompile Include="scene.cpp" />
+    <ClCompile Include="texture.cpp" />
+    <ClCompile Include="tga.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GLSLProgram.h" />
+    <ClInclude Include="material.h" />
+    <ClInclude Include="materialstate.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="renderstate.h" />
     <ClInclude Include="scene.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="texturesource.h" />
+    <ClInclude Include="tga.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fragment.glsl" />
+    <None Include="material.xml" />
+    <None Include="rim-fragment.glsl" />
+    <None Include="shadow-material.xml" />
+    <None Include="vertex.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xsd Include="material.xsd">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </Xsd>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

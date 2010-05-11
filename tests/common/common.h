@@ -20,6 +20,10 @@ class Timer {
 public:
 	Timer();
 	void start();
+
+	/**
+	 * Returns the elapsed time in milliseconds.
+	 */
 	double end();
 private:
 	LARGE_INTEGER mStart;

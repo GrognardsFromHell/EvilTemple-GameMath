@@ -8,6 +8,7 @@
 GAMEMATH_NAMESPACE_BEGIN
 
 GAMEMATH_ALIGN class Matrix4 {
+friend GAMEMATH_INLINE Matrix4 operator *(const Matrix4 &a, const Matrix4 &b);
 public:
 	/**
 	 * Sets this matrix to the identity matrix.
@@ -80,6 +81,22 @@ public:
 	static Matrix4 transformation(const Vector4 &scale, const Quaternion &rotation, const Vector4 &translation);
 
 	/**
+	 * Constructs a translation matrix from the given vector.
+	 *
+	 * @param translation The translation vector. The w component is ignored.
+	 */
+	static Matrix4 translation(const Vector4 &translation);
+
+	/**
+	 * Creates a viewing matrix, that is equivalent to the matrix created by gluLookAt.
+	 *
+	 * @param eye The position of the camera in world space. The w coordinate must be 0.
+	 * @param center The position in world space on which the camera is centered. The w coordinate must be 0.
+	 * @param up The up vector of the camera. This should already be a normalized normal (w=0).
+	 */
+	static Matrix4 lookAt(const Vector4 &eye, const Vector4 &center, const Vector4 &up);
+
+	/**
 	 * Multiplies this scaling matrix with a scaling matrix for the x, y, and z components.
 
 	 * @return A reference to this matrix.
@@ -136,6 +153,39 @@ GAMEMATH_INLINE float Matrix4::operator()(int row, int col) const
 GAMEMATH_INLINE float &Matrix4::operator()(int row, int col)
 {
 	return m[col][row];
+}
+
+GAMEMATH_INLINE Matrix4 Matrix4::lookAt(const Vector4 &eye, const Vector4 &center, const Vector4 &up)
+{
+	Vector4 F = center - eye;
+	F.normalize();
+
+	Vector4 s = F.cross(up);
+	Vector4 u = s.cross(F);
+	F = -F;
+
+	Matrix4 result;
+	result.m[0][0] = s.x();
+	result.m[1][0] = s.y();
+	result.m[2][0] = s.z();
+	result.m[3][0] = 0;
+
+	result.m[0][1] = u.x();
+	result.m[1][1] = u.y();
+	result.m[2][1] = u.z();
+	result.m[3][1] = 0;
+
+	result.m[0][2] = F.x();
+	result.m[1][2] = F.y();
+	result.m[2][2] = F.z();
+	result.m[3][2] = 0;
+
+	result.m[0][3] = 0;
+	result.m[1][3] = 0;
+	result.m[2][3] = 0;
+	result.m[3][3] = 1;
+	
+	return result * Matrix4::translation(- eye);
 }
 
 GAMEMATH_NAMESPACE_END

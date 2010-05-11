@@ -7,17 +7,20 @@
 
 Model::Model()
 	: faceGroups(0), positions(0), normals(0), texCoords(0), vertices(0), vertexData(0), faceData(0)
-	, positionBuffer(0), normalBuffer(0), texcoordBuffer(0)
+	, positionBuffer(0), normalBuffer(0), texcoordBuffer(0), materialState(0), textureData(0)
 {
 }
 
 Model::~Model()
 {
 	delete [] faceGroups;
+	delete [] materialState;
 	if (faceData)
 		ALIGNED_FREE(faceData);
 	if (vertexData)
 		ALIGNED_FREE(vertexData);
+	if (textureData)
+		ALIGNED_FREE(textureData);
 }
 
 struct ModelHeader
@@ -36,41 +39,78 @@ struct ChunkHeader
 	uint size;
 };
 
-bool Model::open(const char *filename)
+class ModelTextureSource : public TextureSource {
+public:
+	ModelTextureSource(const QVector<unsigned char*> &textures, const QVector<int> &textureSizes) : mTextures(textures), mTextureSizes(textureSizes)
+	{
+	}
+
+	SharedTexture loadTexture(const QString &name)
+	{
+		if (name.startsWith('#')) {
+			bool ok;
+			uint textureId = name.right(name.length() - 1).toUInt(&ok);
+			if (ok && textureId < mTextures.size()) {
+				// Try loading the TGA image
+				TGAImg img;
+				img.LoadRaw((char*)mTextures[textureId], mTextureSizes[textureId]);
+
+				SharedTexture texture(new Texture);
+				texture->load(img);
+
+				return texture;
+			}
+		}
+
+		// Create an error texture and return it...
+		return SharedTexture(0);
+	}
+
+private:
+	QVector<unsigned char*> mTextures;
+	QVector<int> mTextureSizes;
+};
+
+bool Model::open(const char *filename, const RenderStates &renderState)
 {
+	mError.clear();
+
 	FILE *fp = fopen(filename, "rb");
 
 	if (!fp) {
+		mError.append(QString("Unable to open model file %1.").arg(filename));
 		return false;
 	}
 
 	ModelHeader header;
 
 	if (!fread(&header, sizeof(header), 1, fp)) {
-		fprintf(stderr, "Unable to read model file header from %s.\n", filename);
+		mError.append(QString("Unable to read model file header from %1.").arg(filename));
 		fclose(fp);
 		return false;
 	}
 
 	if (header.magic[0] != 'M' || header.magic[1] != 'O' || header.magic[2] != 'D' || header.magic[3] != 'L') {
-		fprintf(stderr, "File has invalid magic number: %s.\n", filename);
+		mError.append(QString("File has invalid magic number: %1.").arg(filename));
 		fclose(fp);
 		return false;
 	}
-	
+
+	QVector<unsigned char*> textures;
+	QVector<int> texturesSize;
+
 	for (uint i = 0; i < header.chunks; ++i) {
 		ChunkHeader chunkHeader;
 
 		if (!fread(&chunkHeader, sizeof(ChunkHeader), 1, fp)) {
-			fprintf(stderr, "Unable to read chunk %d from file %s.\n", i, filename);
+			mError.append(QString("Unable to read chunk %1 from file %2.").arg(i).arg(filename));
 			fclose(fp);
 			return false;
 		}
 
-		if (chunkHeader.type != 2 && chunkHeader.type != 3) {
+		if (chunkHeader.type < 1 || chunkHeader.type > 4) {
 			// Skip, unknown chunk
-			fprintf(stderr, "WARN: Unknown chunk type %d in model file %s.\n", chunkHeader.type, filename);
-			
+			mError.append(QString("WARN: Unknown chunk type %1 in model file %2.").arg(chunkHeader.type).arg(filename));
 			fseek(fp, chunkHeader.size, SEEK_CUR);
 			continue;
 		}
@@ -79,14 +119,61 @@ bool Model::open(const char *filename)
 		
 		if (!fread(chunkData, chunkHeader.size, 1, fp)) {
 			ALIGNED_FREE(chunkData);
-			fprintf(stderr, "Unable to read data of chunk %d in %s.\n", i, filename);
+			mError.append(QString("Unable to read data of chunk %1 in %2.").arg(i).arg(filename));
 			return false;
 		}
 
-		if (chunkHeader.type == 2) {
+		if (chunkHeader.type == 1) {
+			textureData = chunkData;
+
+			unsigned int textureCount = *(unsigned int*)textureData;
+			textures.resize(textureCount);
+			texturesSize.resize(textureCount);
+
+			unsigned char* ptr = static_cast<unsigned char*>(textureData);
+			ptr += 16;
+
+			for (int j = 0; j < textureCount; ++j) {
+				unsigned int size = *(unsigned int*)(ptr);
+				ptr += sizeof(unsigned int);
+				textures[j] = ptr;
+				texturesSize[j] = size;
+				ptr += size;
+			}
+		} else if (chunkHeader.type == 2) {
+			unsigned int count = *(unsigned int*)chunkData;
+			materialState = new MaterialState[count];
+
+			char *ptr = static_cast<char*>(chunkData) + 16;
+
+			ModelTextureSource textureSource(textures, texturesSize);
+
+			for (int j = 0; j < count; ++j) {
+				unsigned int size = *(unsigned int*)ptr;
+				ptr += sizeof(unsigned int);
+				QByteArray rawMaterialData = QByteArray::fromRawData(ptr, size);
+				ptr += size;
+
+				Material material;
+
+				if (!material.loadFromData(rawMaterialData)) {
+					mError.append(QString("Unable to read material from model %1:\n%2").arg(filename)
+						.arg(material.error()));
+					return false;
+				}
+
+				if (!materialState[j].createFrom(material, renderState, &textureSource)) {
+					mError.append(QString("Unable to create material state for model %1:\n%2").arg(filename)
+						.arg(materialState[j].error()));
+					return false;
+				}
+			}
+
+			ALIGNED_FREE(chunkData);
+		} else if (chunkHeader.type == 3) {
 			vertexData = chunkData;
 			loadVertexData();
-		} else if (chunkHeader.type == 3) {
+		} else if (chunkHeader.type == 4) {
 			faceData = chunkData;
 			loadFaceData();
 		} else {
@@ -156,9 +243,9 @@ void Model::loadVertexData()
 	glGenBuffersARB(1, &normalBuffer);
 	glGenBuffersARB(1, &texcoordBuffer);
 
-	for (int i = 0; i < vertices; ++i) {
-		positions[i] *= 0.2f;
-	}
+	/*for (int i = 0; i < vertices; ++i) {
+		positions[i] *= 0.1f;
+	}*/
 
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, positionBuffer);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vector4) * vertices, positions, GL_STATIC_DRAW_ARB);
@@ -186,7 +273,7 @@ struct FacesHeader
 
 struct FaceGroupHeader
 {
-	uint materialId;
+	int materialId;
 	uint elementCount;
 	uint elementSize;
 	uint reserved;
@@ -207,7 +294,11 @@ void Model::loadFaceData()
 		currentDataPointer += sizeof(FaceGroupHeader);
 
 		faceGroup->elementCount = groupHeader->elementCount;
-		faceGroup->materialId = groupHeader->materialId;
+		if (groupHeader->materialId == -1) {
+			faceGroup->material = 0;
+		} else {
+			faceGroup->material = materialState + groupHeader->materialId;
+		}
 
 		uint groupSize = groupHeader->elementCount * groupHeader->elementSize;
 
@@ -240,9 +331,8 @@ void Model::drawNormals() const
 	glEnable(GL_LIGHTING);
 }
 
-FaceGroup::FaceGroup() : buffer(0), materialId(0), elementCount(0)
+FaceGroup::FaceGroup() : buffer(0), material(0), elementCount(0)
 {
-
 }
 
 FaceGroup::~FaceGroup()

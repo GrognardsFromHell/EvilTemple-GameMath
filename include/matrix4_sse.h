@@ -161,4 +161,47 @@ GAMEMATH_INLINE Matrix4 Matrix4::transformation(const Vector4 &scale,
 	return result;
 }
 
+GAMEMATH_INLINE Matrix4 operator *(const Matrix4 &m1, const Matrix4 &m2)
+{
+	__m128 resultColumn;
+
+	Matrix4 result;
+
+	resultColumn = _mm_mul_ps(m1.columns[0], _mm_set1_ps(m2.m[0][0]));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[1], _mm_set1_ps(m2.m[0][1])));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[2], _mm_set1_ps(m2.m[0][2])));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[3], _mm_set1_ps(m2.m[0][3])));
+	result.columns[0] = resultColumn;
+
+	resultColumn = _mm_mul_ps(m1.columns[0], _mm_set1_ps(m2.m[1][0]));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[1], _mm_set1_ps(m2.m[1][1])));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[2], _mm_set1_ps(m2.m[1][2])));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[3], _mm_set1_ps(m2.m[1][3])));
+	result.columns[1] = resultColumn;
+
+	resultColumn = _mm_mul_ps(m1.columns[0], _mm_set1_ps(m2.m[2][0]));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[1], _mm_set1_ps(m2.m[2][1])));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[2], _mm_set1_ps(m2.m[2][2])));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[3], _mm_set1_ps(m2.m[2][3])));
+	result.columns[2] = resultColumn;
+
+	resultColumn = _mm_mul_ps(m1.columns[0], _mm_set1_ps(m2.m[3][0]));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[1], _mm_set1_ps(m2.m[3][1])));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[2], _mm_set1_ps(m2.m[3][2])));
+	resultColumn = _mm_add_ps(resultColumn, _mm_mul_ps(m1.columns[3], _mm_set1_ps(m2.m[3][3])));
+	result.columns[3] = resultColumn;
+
+	return result;
+}
+
+GAMEMATH_INLINE Matrix4 Matrix4::translation(const Vector4 &translation)
+{
+	Matrix4 result;
+	result.columns[0] = _mm_load_ps(IdentityCol1);
+	result.columns[1] = _mm_load_ps(IdentityCol2);
+	result.columns[2] = _mm_load_ps(IdentityCol3);
+	result.columns[3] = _mm_set_ps(1, translation.z(), translation.y(), translation.x());
+	return result;
+}
+
 GAMEMATH_NAMESPACE_END

@@ -3,107 +3,108 @@
 #include <gl/glew.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
+#include <string>
+#include <sstream>
 
+#include "tga.h"
 #include "model.h"
+#include "material.h"
+#include "materialstate.h"
 
 #include "../../include/gamemath.h"
 using namespace GameMath;
 
-GLUquadric *sphere;
+#include <QtCore/QFile>
 
-static Vector4 positions[8] = {
-	// Bottom
-	Vector4(-1, -1, -1, 1), // Front, Left
-	Vector4(1, -1, -1, 1), // Front, Right
-	Vector4(1, -1, 1, 1), // Back, Right
-	Vector4(-1, -1, 1, 1), // Back, Left
-	// Top
-	Vector4(-1, 1, -1, 1), // Front, Left
-	Vector4(1, 1, -1, 1), // Front, Right
-	Vector4(1, 1, 1, 1), // Back, Right
-	Vector4(-1, 1, 1, 1), // Back, Left
-};
-
-// We're using one normal vector per face, they face the same direction as the side of the cube
-static Vector4 faceNormals[] = {
-	Vector4(0, -1, 0, 0), // Bottom
-	Vector4(0, 1, 0, 0), // Top
-	Vector4(0, 0, -1, 0), // Front
-	Vector4(0, 0, 1, 0), // Back
-	Vector4(-1, 0, 0, 0), // Left
-	Vector4(1, 0, 0, 0), // Right
-};
-
-static int faces[] = {
-	0, 1, 2, 3, // Bottom
-	7, 6, 5, 4, // Top
-	4, 5, 1, 0, // Front
-	3, 2, 6, 7, // Back
-	7, 4, 0, 3, // Left
-	2, 1, 5, 6, // Right
-};
-static int faceCount = sizeof(faces) / sizeof(int) / 4;
+void Draw(Model *model);
+void Draw(Model *model, MaterialState *material);
 
 Model model;
 
-bool CreateScene()
+#define HANDLE_GL_ERROR handleGlError(__FILE__, __LINE__);
+inline static void handleGlError(const char *file, int line) {
+	std::string error;
+
+	GLenum glErr = glGetError();
+	while (glErr != GL_NO_ERROR) {
+		std::stringstream errorString;
+
+		errorString << "OpenGL error in " << file << " @ line " << line << ": " << gluErrorString(glErr) << std::endl;
+
+		error.append(errorString.str());
+
+		glErr = glGetError();
+	}
+
+	if (error.size() > 0) {
+		MessageBoxA(NULL, error.c_str(), "OpenGL Error", MB_OK|MB_ICONERROR);
+	}
+}
+
+RenderStates renderStates;
+
+class FileTextureSource : public TextureSource
 {
-	GLenum err = glewInit();
+public:
+	SharedTexture loadTexture(const QString &name)
+	{
+		// Try loading the TGA image
+		TGAImg img;
+		img.Load(qPrintable(name)); // TODO: Error handling, Best bet: load some "error" texture instead
 
-	if (GLEW_OK != err) {
-		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+		SharedTexture texture(new Texture);
+		texture->load(img);
+
+		return texture;
+	}
+};
+
+FileTextureSource textureSource;
+
+bool CreateScene(int w, int h, const char *modelFile)
+{
+	Matrix4 projectionMatrix;
+	Matrix4 viewMatrix;
+
+	glEnable(GL_MULTISAMPLE);
+
+	if (!model.open(modelFile, renderStates)) {
+		MessageBoxA(NULL, qPrintable(model.error()), "Error", MB_OK|MB_ICONERROR);
 		return false;
 	}
-
-	if (!GLEW_VERSION_2_0) {
-		fprintf(stderr, "Error: OpenGL 2.0 required.");
-		return false;
-	}
-	
-	if (!model.open("test.model")) {
-		return false;
-	}
-	model.close();
-	model.open("test.model");
-
+		
 	glEnable(GL_DEPTH_TEST); // Use Z-Buffer & depth testing
-	glEnable(GL_CULL_FACE);
+	HANDLE_GL_ERROR
 
-	// Set up projection only once
+	glEnable(GL_CULL_FACE);
+	HANDLE_GL_ERROR
+		
+	// TODO: Convert this to Matrix4-only code (don't use the GL matrix stack)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45, 1, 1, 1000);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0, 25, 50, 0, 0, 0, 0, 1, 0);
-
-	glEnable(GL_LIGHTING);
-
-	// Enable diffuse lighting
-	const GLfloat diffuseColor[] = {0.9, 0.9, 0.9, 1};
-	const GLfloat diffuseDirection[] = {0, 0.89, 0.447, 0};
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseColor);
-	glLightfv(GL_LIGHT0, GL_POSITION, diffuseDirection);
-	glEnable(GL_LIGHT0);
+	//gluPerspective(45, (float)w / (float)h, 1, 200);
+	glOrtho(-w/2, w/2, -h/2, h/2, 1, 3628);
+	glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrix.data());
+	renderStates.setProjectionMatrix(projectionMatrix);
 	
-	// Set global ambient light color
-	GLfloat globalAmbient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+	Vector4 eyeVector(250.0, 500, 500, 0);
+	Vector4 centerVector(0, 10, 0, 0);
+	Vector4 upVector(0, 1, 0, 0);
+	viewMatrix = Matrix4::lookAt(eyeVector, centerVector, upVector);
 	
-	sphere = gluNewQuadric();
-
-	glDisable(GL_COLOR_MATERIAL);
-
-	glEnable(GL_SMOOTH);
-
+	renderStates.setViewMatrix(viewMatrix);
+		
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_NOTEQUAL, 0);
+	glEnable(GL_BLEND); HANDLE_GL_ERROR
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); HANDLE_GL_ERROR
+	
 	return true;
 }
 
 void DestroyScene()
 {
 	model.close();
-	gluDeleteQuadric(sphere);
 }
 
 void DrawScene(double secondsElapsed)
@@ -111,69 +112,194 @@ void DrawScene(double secondsElapsed)
 	const double anglePerSecond = 90;
 	float angle = (float)(secondsElapsed * anglePerSecond);
 
-	// The following lines enable a "bobbing" of the camera along the Y axis
-	/*glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0, std::sinf(secondsElapsed) * 20, -50, 0, 0, 0, 0, 1, 0);*/
-
 	// We only draw once all messages have been processed
-	glClearColor( 1.0f, 0.0f, 0.0f, 0.0f );
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glClearColor( 0.1f, 0.1f, 0.1f, 1.0f ); HANDLE_GL_ERROR
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); HANDLE_GL_ERROR
 
-	glColor3f(1, 1, 1);
-	
-	glPushMatrix();
-	
 	Quaternion q = Quaternion::fromAxisAndAngle(0, 1, 0, angle * 0.01745329251994329576923690768489);
 	Matrix4 m = Matrix4::transformation(Vector4(1, 1, 1, 0), q, Vector4(0, 0, 0, 0));
+	renderStates.setWorldMatrix(m);
 
-	glBegin(GL_QUADS);
-	for (int i = 0; i < faceCount; i++) {
-		glNormal3fv((m * faceNormals[i]).data());
+	Draw(&model);
+}
 
-		for (int j = 0; j < 4; ++j) {
-			Vector4 transformedVector = m * positions[faces[i * 4 + j]];
+void Draw(Model *model) {
+	for (int faceGroupId = 0; faceGroupId < model->faces; ++faceGroupId) {
+		const FaceGroup &faceGroup = model->faceGroups[faceGroupId];
+		MaterialState *material = faceGroup.material;
 
-			glVertex3fv(transformedVector.data());
+		if (!material)
+			continue;
+
+		for (int i = 0; i < material->passes.size(); ++i) {
+			MaterialPassState &pass = material->passes[i];
+
+			pass.program.bind(); HANDLE_GL_ERROR
+
+			// Bind texture samplers
+			for (int j = 0; j < pass.textureSamplers.size(); ++j) {
+				pass.textureSamplers[j].bind(); HANDLE_GL_ERROR
+			}
+
+			// Bind uniforms
+			for (int j = 0; j < pass.uniforms.size(); ++j) {
+				pass.uniforms[j].bind(); HANDLE_GL_ERROR
+			}
+
+			// Bind attributes
+			for (int j = 0; j < pass.attributes.size(); ++j) {
+				MaterialPassAttributeState &attribute = pass.attributes[j];
+
+				// Bind the correct buffer
+				switch (attribute.bufferType) {
+				case 0:
+					glBindBuffer(GL_ARRAY_BUFFER, model->positionBuffer);
+					break;
+				case 1:
+					glBindBuffer(GL_ARRAY_BUFFER, model->normalBuffer);
+					break;
+				case 2:
+					glBindBuffer(GL_ARRAY_BUFFER, model->texcoordBuffer);
+					break;
+				}
+
+				// Assign the attribute
+				glEnableVertexAttribArray(attribute.location);
+				glVertexAttribPointer(attribute.location, attribute.binding.components(), attribute.binding.type(), 
+					attribute.binding.normalized(), attribute.binding.stride(), (GLvoid*)attribute.binding.offset());
+				HANDLE_GL_ERROR
+			}
+
+			// Set render states
+			foreach (const SharedMaterialRenderState &state, pass.renderStates) {
+				state->enable();
+			}
+		
+			// Draw the actual model
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, faceGroup.buffer); HANDLE_GL_ERROR
+			glDrawElements(GL_TRIANGLES, faceGroup.elementCount, GL_UNSIGNED_SHORT, 0); HANDLE_GL_ERROR
+
+			// Reset render states to default
+			foreach (const SharedMaterialRenderState &state, pass.renderStates) {
+				state->disable();
+			}
+
+			// Unbind textures
+			for (int j = 0; j < pass.textureSamplers.size(); ++j) {
+				pass.textureSamplers[j].unbind();
+			}
+
+			// Unbind attributes
+			for (int j = 0; j < pass.attributes.size(); ++j) {
+				MaterialPassAttributeState &attribute = pass.attributes[j];
+				glDisableVertexAttribArray(attribute.location); HANDLE_GL_ERROR
+			}
+
+			pass.program.unbind();
 		}
 	}
-	glEnd();
-	glPopMatrix();
-		
-	// Draw earth
-	glPushMatrix();
-	glRotatef(angle, 0, 1, 0);
-	glTranslatef(10, 0, 0);
-	gluSphere(sphere, 1, 100, 100);
-	glPopMatrix();
+}
 
-	// Draw sun
-	//glPushMatrix();
-	//gluSphere(sphere, 3, 100, 100);
-	//glPopMatrix();
+void Draw(Model *model, MaterialState *material) {
+	for (int faceGroupId = 0; faceGroupId < model->faces; ++faceGroupId) {
+		const FaceGroup &faceGroup = model->faceGroups[faceGroupId];
 
-	glPushMatrix();
-	glRotatef(angle, 0, 1, 0);
+		for (int i = 0; i < material->passes.size(); ++i) {
+			MaterialPassState &pass = material->passes[i];
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
+			pass.program.bind(); HANDLE_GL_ERROR
 
-	glBindBufferARB(GL_ARRAY_BUFFER_ARB, model.positionBuffer);
-	glVertexPointer(4, GL_FLOAT, 0, 0);
+				// Bind texture samplers
+				for (int j = 0; j < pass.textureSamplers.size(); ++j) {
+					pass.textureSamplers[j].bind(); HANDLE_GL_ERROR
+				}
 
-	glBindBufferARB(GL_ARRAY_BUFFER_ARB, model.normalBuffer);
-	glNormalPointer(GL_FLOAT, sizeof(float) * 4, 0);
+				// Bind uniforms
+				for (int j = 0; j < pass.uniforms.size(); ++j) {
+					pass.uniforms[j].bind(); HANDLE_GL_ERROR
+				}
 
-	for (int i = 0; i < model.faces; ++i) {
-		const FaceGroup &faceGroup = model.faceGroups[i];
+				// Bind attributes
+				for (int j = 0; j < pass.attributes.size(); ++j) {
+					MaterialPassAttributeState &attribute = pass.attributes[j];
 
-		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, faceGroup.buffer);
-		glDrawElements(GL_TRIANGLES, faceGroup.elementCount, GL_UNSIGNED_SHORT, 0);
+					// Bind the correct buffer
+					switch (attribute.bufferType) {
+					case 0:
+						glBindBuffer(GL_ARRAY_BUFFER, model->positionBuffer);
+						break;
+					case 1:
+						glBindBuffer(GL_ARRAY_BUFFER, model->normalBuffer);
+						break;
+					case 2:
+						glBindBuffer(GL_ARRAY_BUFFER, model->texcoordBuffer);
+						break;
+					}
+
+					// Assign the attribute
+					glEnableVertexAttribArray(attribute.location);
+					glVertexAttribPointer(attribute.location, attribute.binding.components(), attribute.binding.type(), 
+						attribute.binding.normalized(), attribute.binding.stride(), (GLvoid*)attribute.binding.offset());
+					HANDLE_GL_ERROR
+				}
+
+				// Set render states
+				foreach (const SharedMaterialRenderState &state, pass.renderStates) {
+					state->enable();
+				}
+
+				// Draw the actual model
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, faceGroup.buffer); HANDLE_GL_ERROR
+					glDrawElements(GL_TRIANGLES, faceGroup.elementCount, GL_UNSIGNED_SHORT, 0); HANDLE_GL_ERROR
+
+					// Reset render states to default
+					foreach (const SharedMaterialRenderState &state, pass.renderStates) {
+						state->disable();
+				}
+
+				// Unbind textures
+				for (int j = 0; j < pass.textureSamplers.size(); ++j) {
+					pass.textureSamplers[j].unbind();
+				}
+
+				// Unbind attributes
+				for (int j = 0; j < pass.attributes.size(); ++j) {
+					MaterialPassAttributeState &attribute = pass.attributes[j];
+					glDisableVertexAttribArray(attribute.location); HANDLE_GL_ERROR
+				}
+
+				pass.program.unbind();
+		}
 	}
+}
 
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+void KeyPressed(int key)
+{
+	static bool viewOne = true;
 
-	glPopMatrix();
+	if (key == VK_F1) {
+
+		Matrix4 viewMatrix;
+
+		if (!viewOne) {
+			Vector4 eyeVector(250.0, 500, 500, 0);
+			Vector4 centerVector(0, 10, 0, 0);
+			Vector4 upVector(0, 1, 0, 0);
+			viewMatrix = Matrix4::lookAt(eyeVector, centerVector, upVector);
+		} else {
+
+			// 135,0000005619373 Rotation around Y axis
+			// -44,42700648682643 Rotation around X axis
+
+			Quaternion rot1 = Quaternion::fromAxisAndAngle(0, 1, 0, -135.0000005619373);
+			Quaternion rot2 = Quaternion::fromAxisAndAngle(1, 0, 0, -44.42700648682643);
+
+			viewMatrix = Matrix4::transformation(Vector4(1,1,1,0),rot1,Vector4(0,0,-2000,0)) * Matrix4::transformation(Vector4(1,1,1,0),rot2,Vector4(0,0,0,0));
+		}
+
+		renderStates.setViewMatrix(viewMatrix);
+
+		viewOne = !viewOne;
+
+	}
 }
