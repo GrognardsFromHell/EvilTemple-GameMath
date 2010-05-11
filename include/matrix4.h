@@ -200,11 +200,11 @@ GAMEMATH_INLINE Matrix4 Matrix4::ortho(float left, float right, float bottom, fl
 	result.setToZero();
 	result.m[0][0] = 2.0f / (right - left);
 	result.m[1][1] = 2.0f / (top - bottom);
-	result.m[2][2] = 2.0f / (farVal - nearVal);
+	result.m[2][2] = - 2.0f / (farVal - nearVal);
 
-	result.m[3][0] = (right + left) / (right - left);
-	result.m[3][1] = (top + bottom) / (top - bottom);
-	result.m[3][2] = (farVal + nearVal) / (farVal - nearVal);
+	result.m[3][0] = - (right + left) / (right - left);
+	result.m[3][1] = - (top + bottom) / (top - bottom);
+	result.m[3][2] = - (farVal + nearVal) / (farVal - nearVal);
 	result.m[3][3] = 1;
 
 	return result;

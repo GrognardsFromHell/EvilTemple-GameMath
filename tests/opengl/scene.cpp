@@ -63,9 +63,6 @@ FileTextureSource textureSource;
 
 bool CreateScene(int w, int h, const char *modelFile)
 {
-	Matrix4 projectionMatrix;
-	Matrix4 viewMatrix;
-
 	glEnable(GL_MULTISAMPLE);
 
 	if (!model.open(modelFile, renderStates)) {
@@ -80,17 +77,13 @@ bool CreateScene(int w, int h, const char *modelFile)
 	HANDLE_GL_ERROR
 		
 	// TODO: Convert this to Matrix4-only code (don't use the GL matrix stack)
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	//gluPerspective(45, (float)w / (float)h, 1, 200);
-	glOrtho(-w/2, w/2, -h/2, h/2, 1, 3628);
-	glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrix.data());
+	Matrix4 projectionMatrix = Matrix4::ortho(-w/2, w/2, -h/2, h/2, 1, 3628);
 	renderStates.setProjectionMatrix(projectionMatrix);
 
 	Vector4 eyeVector(250.0, 500, 500, 0);
 	Vector4 centerVector(0, 10, 0, 0);
 	Vector4 upVector(0, 1, 0, 0);
-	viewMatrix = Matrix4::lookAt(eyeVector, centerVector, upVector);
+	Matrix4 viewMatrix = Matrix4::lookAt(eyeVector, centerVector, upVector);
 
 	renderStates.setViewMatrix(viewMatrix);
 		
