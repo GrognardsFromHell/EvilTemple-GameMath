@@ -127,7 +127,7 @@ public:
 	 * This methods behaves exactly like glOrtho and will return an ortographic projection matrix for the
 	 * given values.
 	 */
-	Matrix4 ortho(float left, float right, float bottom, float top, float nearVal, float farVal);
+	static Matrix4 ortho(float left, float right, float bottom, float top, float nearVal, float farVal);
 
 	void print() const;
 private:
