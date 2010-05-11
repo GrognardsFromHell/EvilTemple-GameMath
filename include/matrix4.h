@@ -123,6 +123,12 @@ public:
 	 */
 	Vector4 mapNormal(const Vector4 &vector) const;
 
+	/**
+	 * This methods behaves exactly like glOrtho and will return an ortographic projection matrix for the
+	 * given values.
+	 */
+	Matrix4 ortho(float left, float right, float bottom, float top, float nearVal, float farVal);
+
 	void print() const;
 private:
 #if !defined(GAMEMATH_NO_INTRINSICS)
@@ -186,6 +192,22 @@ GAMEMATH_INLINE Matrix4 Matrix4::lookAt(const Vector4 &eye, const Vector4 &cente
 	result.m[3][3] = 1;
 	
 	return result * Matrix4::translation(- eye);
+}
+
+GAMEMATH_INLINE Matrix4 Matrix4::ortho(float left, float right, float bottom, float top, float nearVal, float farVal)
+{
+	Matrix4 result;
+	result.setToZero();
+	result.m[0][0] = 2.0f / (right - left);
+	result.m[1][1] = 2.0f / (top - bottom);
+	result.m[2][2] = 2.0f / (farVal - nearVal);
+
+	result.m[3][0] = (right + left) / (right - left);
+	result.m[3][1] = (top + bottom) / (top - bottom);
+	result.m[3][2] = (farVal + nearVal) / (farVal - nearVal);
+	result.m[3][3] = 1;
+
+	return result;
 }
 
 GAMEMATH_NAMESPACE_END

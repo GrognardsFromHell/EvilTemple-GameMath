@@ -86,12 +86,12 @@ bool CreateScene(int w, int h, const char *modelFile)
 	glOrtho(-w/2, w/2, -h/2, h/2, 1, 3628);
 	glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrix.data());
 	renderStates.setProjectionMatrix(projectionMatrix);
-	
+
 	Vector4 eyeVector(250.0, 500, 500, 0);
 	Vector4 centerVector(0, 10, 0, 0);
 	Vector4 upVector(0, 1, 0, 0);
 	viewMatrix = Matrix4::lookAt(eyeVector, centerVector, upVector);
-	
+
 	renderStates.setViewMatrix(viewMatrix);
 		
 	glEnable(GL_ALPHA_TEST);
