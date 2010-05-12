@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix4", "tests\matrix4\ma
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opengl", "tests\opengl\opengl.vcxproj", "{6712FF14-7176-45B7-AC21-C539FA65964F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "box2d", "tests\box2d\box2d.vcxproj", "{19F8EC18-EF15-41BF-A389-3282B8B32893}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -38,6 +40,10 @@ Global
 		{6712FF14-7176-45B7-AC21-C539FA65964F}.Debug|Win32.Build.0 = Debug|Win32
 		{6712FF14-7176-45B7-AC21-C539FA65964F}.Release|Win32.ActiveCfg = Release|Win32
 		{6712FF14-7176-45B7-AC21-C539FA65964F}.Release|Win32.Build.0 = Release|Win32
+		{19F8EC18-EF15-41BF-A389-3282B8B32893}.Debug|Win32.ActiveCfg = Debug|Win32
+		{19F8EC18-EF15-41BF-A389-3282B8B32893}.Debug|Win32.Build.0 = Debug|Win32
+		{19F8EC18-EF15-41BF-A389-3282B8B32893}.Release|Win32.ActiveCfg = Release|Win32
+		{19F8EC18-EF15-41BF-A389-3282B8B32893}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

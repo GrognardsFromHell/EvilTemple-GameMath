@@ -129,8 +129,16 @@ public:
 	 */
 	static Matrix4 ortho(float left, float right, float bottom, float top, float nearVal, float farVal);
 
-	void print() const;
+	/**
+	 * Creates the inverse of this matrix and returns it.
+	 */
+	Matrix4 inverted() const;
+
+	void print() const;	
 private:
+	float matrixDet3(int col0, int col1, int col2, int row0, int row1, int row2) const;
+	float matrixDet4() const;
+
 #if !defined(GAMEMATH_NO_INTRINSICS)
 	union {
 		__m128 columns[4];
@@ -208,6 +216,72 @@ GAMEMATH_INLINE Matrix4 Matrix4::ortho(float left, float right, float bottom, fl
 	result.m[3][3] = 1;
 
 	return result;
+}
+
+// The 4x4 matrix inverse algorithm is based on that described at:
+// http://www.j3d.org/matrix_faq/matrfaq_latest.html#Q24
+// Some optimization has been done to avoid making copies of 3x3
+// sub-matrices and to unroll the loops.
+
+// Calculate the determinant of a 3x3 sub-matrix.
+//     | A B C |
+// M = | D E F |   det(M) = A * (EI - HF) - B * (DI - GF) + C * (DH - GE)
+//     | G H I |
+GAMEMATH_INLINE float Matrix4::matrixDet3
+	(int col0, int col1, int col2,
+	int row0, int row1, int row2) const
+{
+	return m[col0][row0] *
+		(m[col1][row1] * m[col2][row2] -
+		m[col1][row2] * m[col2][row1]) -
+		m[col1][row0] *
+		(m[col0][row1] * m[col2][row2] -
+		m[col0][row2] * m[col2][row1]) +
+		m[col2][row0] *
+		(m[col0][row1] * m[col1][row2] -
+		m[col0][row2] * m[col1][row1]);
+}
+
+// Calculate the determinant of a 4x4 matrix.
+GAMEMATH_INLINE float Matrix4::matrixDet4() const
+{
+	float det;
+	det  = m[0][0] * matrixDet3(1, 2, 3, 1, 2, 3);
+	det -= m[1][0] * matrixDet3(0, 2, 3, 1, 2, 3);
+	det += m[2][0] * matrixDet3(0, 1, 3, 1, 2, 3);
+	det -= m[3][0] * matrixDet3(0, 1, 2, 1, 2, 3);
+	return det;
+}
+
+// TODO: Fix this code by rewriting it. This is currently the version provided by Qt
+GAMEMATH_INLINE Matrix4 Matrix4::inverted() const
+{
+	Matrix4 inv;
+
+	float det = matrixDet4();
+	if (det == 0.0f) {
+		return Matrix4();
+	}
+	det = 1.0f / det;
+
+	inv.m[0][0] =  matrixDet3(1, 2, 3, 1, 2, 3) * det;
+	inv.m[0][1] = -matrixDet3(0, 2, 3, 1, 2, 3) * det;
+	inv.m[0][2] =  matrixDet3(0, 1, 3, 1, 2, 3) * det;
+	inv.m[0][3] = -matrixDet3(0, 1, 2, 1, 2, 3) * det;
+	inv.m[1][0] = -matrixDet3(1, 2, 3, 0, 2, 3) * det;
+	inv.m[1][1] =  matrixDet3(0, 2, 3, 0, 2, 3) * det;
+	inv.m[1][2] = -matrixDet3(0, 1, 3, 0, 2, 3) * det;
+	inv.m[1][3] =  matrixDet3(0, 1, 2, 0, 2, 3) * det;
+	inv.m[2][0] =  matrixDet3(1, 2, 3, 0, 1, 3) * det;
+	inv.m[2][1] = -matrixDet3(0, 2, 3, 0, 1, 3) * det;
+	inv.m[2][2] =  matrixDet3(0, 1, 3, 0, 1, 3) * det;
+	inv.m[2][3] = -matrixDet3(0, 1, 2, 0, 1, 3) * det;
+	inv.m[3][0] = -matrixDet3(1, 2, 3, 0, 1, 2) * det;
+	inv.m[3][1] =  matrixDet3(0, 2, 3, 0, 1, 2) * det;
+	inv.m[3][2] = -matrixDet3(0, 1, 3, 0, 1, 2) * det;
+	inv.m[3][3] =  matrixDet3(0, 1, 2, 0, 1, 2) * det;
+
+	return inv;
 }
 
 GAMEMATH_NAMESPACE_END

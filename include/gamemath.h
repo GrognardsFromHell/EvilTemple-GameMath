@@ -62,6 +62,7 @@ class Matrix4;
 GAMEMATH_NAMESPACE_END
 
 #include "gamemath_constants.h"
+#include "box2d.h"
 #include "vector4.h"
 #include "quaternion.h"
 #include "matrix4.h"

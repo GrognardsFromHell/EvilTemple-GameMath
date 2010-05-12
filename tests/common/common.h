@@ -99,6 +99,7 @@ GAMEMATH_INLINE void aCompare(float actual, float expected, const char *actualEx
 }
 
 #define COMPARE(actual, expected) aCompare(actual, expected, #actual, #expected);
+#define EXPECT(actual) if (!(actual)) { printf("Assertion failed for %s.\n", #actual); }
 
 static void printVector(const GameMath::Vector4 &v) {
 	printf("%f %f %f %f\n", v.x(), v.y(), v.z(), v.w());	
