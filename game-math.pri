@@ -5,3 +5,6 @@ HEADERS += $${PWD}/include/gamemath.h \
 	$${PWD}/include/vector4.h
 
 INCLUDEPATH += $${PWD}/include
+
+win32-g++:QMAKE_CXXFLAGS += -msse -msse2 -mmmx -mfpmath=sse
+win32-g++:QMAKE_CFLAGS += -msse -msse2 -mmmx -mfpmath=sse
