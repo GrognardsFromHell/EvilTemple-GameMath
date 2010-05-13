@@ -22,6 +22,7 @@ GAMEMATH_INLINE Quaternion::Quaternion(const Quaternion &other)
 GAMEMATH_INLINE Quaternion &Quaternion::operator =(const Quaternion &other)
 {
 	mSse = other.mSse;
+	return *this;
 }
 
 GAMEMATH_INLINE Quaternion Quaternion::fromAxisAndAngle(const float x, const float y, const float z, const float angle)
