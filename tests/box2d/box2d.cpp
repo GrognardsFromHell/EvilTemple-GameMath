@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	EXPECT(!box1.intersects(box3));
 	EXPECT(!box3.intersects(box1));
 	
-	Box2d box4(-2, -2, -0.9, 2); // To the left of box1, partial intersection
+	Box2d box4(-2, -2, -0.9f, 2); // To the left of box1, partial intersection
 	EXPECT(box1.intersects(box4));
 	EXPECT(box4.intersects(box1));
 

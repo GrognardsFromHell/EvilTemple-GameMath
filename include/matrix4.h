@@ -135,6 +135,11 @@ public:
 	Matrix4 inverted() const;
 
 	void print() const;	
+
+	/**
+	 * Returns the transpose of this matrix.
+	 */
+	Matrix4 transposed() const;
 private:
 	float matrixDet3(int col0, int col1, int col2, int row0, int row1, int row2) const;
 	float matrixDet4() const;
@@ -282,6 +287,19 @@ GAMEMATH_INLINE Matrix4 Matrix4::inverted() const
 	inv.m[3][3] =  matrixDet3(0, 1, 2, 0, 1, 2) * det;
 
 	return inv;
+}
+
+GAMEMATH_INLINE Matrix4 Matrix4::transposed() const
+{
+	Matrix4 result;
+
+	for (int x = 0; x < 4; ++x) {
+		for (int y = 0; y < 4; ++y) {
+			result.m[x][y] = m[y][x];
+		}
+	}
+
+	return result;
 }
 
 GAMEMATH_NAMESPACE_END

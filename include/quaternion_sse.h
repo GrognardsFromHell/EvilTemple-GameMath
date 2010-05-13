@@ -26,8 +26,8 @@ GAMEMATH_INLINE Quaternion &Quaternion::operator =(const Quaternion &other)
 
 GAMEMATH_INLINE Quaternion Quaternion::fromAxisAndAngle(const float x, const float y, const float z, const float angle)
 {
-	const float sinAngle = std::sinf(angle * 0.5f);
-	const float cosAngle = std::cosf(angle * 0.5f);
+	const float sinAngle = std::sin(angle * 0.5f);
+	const float cosAngle = std::cos(angle * 0.5f);
 
 	return Quaternion(x * sinAngle, y * sinAngle, z * sinAngle, cosAngle);
 }
