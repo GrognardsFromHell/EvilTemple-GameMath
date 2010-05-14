@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	printVector(c);
 	
 	BENCHMARK("Iterate over 10000 vectors and multiply them with a matrix.") {		
-		for (int i = 0; i < 10000; ++i) {
+		for (int i = 0; i < 1000; ++i) {
 			positionOut[i] = m.mapPosition(positionIn[i]);
 			normalOut[i] = m.mapNormal(normalIn[i]);
 		}
@@ -44,6 +44,12 @@ int main(int argc, char *argv[])
 	COMPARE(result.y(), 20);
 	COMPARE(result.z(), 32);
 	COMPARE(result.w(), 1);
+
+	Matrix4 trans1 = Matrix4::translation(1, 2, 3, 4);
+	COMPARE(trans1(0, 3), 1);
+	COMPARE(trans1(1, 3), 2);
+	COMPARE(trans1(2, 3), 3);
+	COMPARE(trans1(3, 3), 5); // identity matrix is base
 
 	printf("Press enter to continue.\n");
 	fgetc(stdin);

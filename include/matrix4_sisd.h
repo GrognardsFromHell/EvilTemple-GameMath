@@ -94,4 +94,15 @@ GAMEMATH_INLINE Matrix4 Matrix4::transformation(const Vector4 &scale,
 	return result;
 }
 
+GAMEMATH_INLINE Matrix4 Matrix4::translation(float x, float y, float z, float w)
+{
+	Matrix4 result;
+	result.setToIdentity();
+	result(0, 3) = x;
+	result(1, 3) = y;
+	result(2, 3) = z;
+	result(3, 3) = w;
+	return result;
+}
+
 GAMEMATH_NAMESPACE_END

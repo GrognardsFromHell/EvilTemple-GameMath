@@ -79,14 +79,7 @@ public:
 	 *					matrix.
 	 */
 	static Matrix4 transformation(const Vector4 &scale, const Quaternion &rotation, const Vector4 &translation);
-
-	/**
-	 * Constructs a translation matrix from the given vector.
-	 *
-	 * @param translation The translation vector. The w component is ignored.
-	 */
-	static Matrix4 translation(const Vector4 &translation);
-
+	
 	/**
 	 * Creates a viewing matrix, that is equivalent to the matrix created by gluLookAt.
 	 *
@@ -128,6 +121,18 @@ public:
 	 * given values.
 	 */
 	static Matrix4 ortho(float left, float right, float bottom, float top, float nearVal, float farVal);
+
+	/**
+	 * Creates a translation matrix with the given translation offsets, and returns it.
+	 */
+	static Matrix4 translation(float x, float y = 0.0f, float z = 0.0f, float w = 0.0f);
+
+	/**
+	 * Constructs a translation matrix from the given vector.
+	 *
+	 * @param translation The translation vector. The w component should be zero.
+	 */
+	static Matrix4 translation(const Vector4 &translation);
 
 	/**
 	 * Creates the inverse of this matrix and returns it.

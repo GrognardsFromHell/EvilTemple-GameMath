@@ -200,7 +200,17 @@ GAMEMATH_INLINE Matrix4 Matrix4::translation(const Vector4 &translation)
 	result.columns[0] = _mm_load_ps(IdentityCol1);
 	result.columns[1] = _mm_load_ps(IdentityCol2);
 	result.columns[2] = _mm_load_ps(IdentityCol3);
-	result.columns[3] = _mm_set_ps(1, translation.z(), translation.y(), translation.x());
+	result.columns[3] = _mm_add_ps(_mm_load_ps(IdentityCol4), translation.mSse);
+	return result;
+}
+
+GAMEMATH_INLINE Matrix4 Matrix4::translation(float x, float y, float z, float w)
+{
+	Matrix4 result;
+	result.columns[0] = _mm_load_ps(IdentityCol1);
+	result.columns[1] = _mm_load_ps(IdentityCol2);
+	result.columns[2] = _mm_load_ps(IdentityCol3);
+	result.columns[3] = _mm_add_ps(_mm_load_ps(IdentityCol4), _mm_set_ps(w, z, y, x));
 	return result;
 }
 
