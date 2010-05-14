@@ -63,6 +63,11 @@ public:
 	 */
 	static Quaternion fromAxisAndAngle(const float x, const float y, const float z, const float angle);
 
+	/**
+	 * Retrieve the angle of rotation from this quaternion by applying cos^-1 to the scalar and multiplying with two.
+	 */
+	float angle() const;
+
 private:
 
 #if !defined(GAMEMATH_NO_INTRINSICS)

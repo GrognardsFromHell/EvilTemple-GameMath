@@ -33,4 +33,9 @@ GAMEMATH_INLINE Quaternion Quaternion::fromAxisAndAngle(const float x, const flo
 	return Quaternion(x * sinAngle, y * sinAngle, z * sinAngle, cosAngle);
 }
 
+GAMEMATH_INLINE float Quaternion::angle() const
+{
+	return (float)(std::acos((double)mW) * 2.0);
+}
+
 GAMEMATH_NAMESPACE_END
