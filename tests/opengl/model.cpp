@@ -134,6 +134,7 @@ bool Model::open(const char *filename, const RenderStates &renderState)
 			ptr += 16;
 
 			for (int j = 0; j < textureCount; ++j) {
+				ptr += 16; // Skip md5 hash
 				unsigned int size = *(unsigned int*)(ptr);
 				ptr += sizeof(unsigned int);
 				textures[j] = ptr;
@@ -149,6 +150,7 @@ bool Model::open(const char *filename, const RenderStates &renderState)
 			ModelTextureSource textureSource(textures, texturesSize);
 
 			for (int j = 0; j < count; ++j) {
+				ptr += 16; // Skips md5 hash
 				unsigned int size = *(unsigned int*)ptr;
 				ptr += sizeof(unsigned int);
 				QByteArray rawMaterialData = QByteArray::fromRawData(ptr, size);

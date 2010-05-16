@@ -30,6 +30,7 @@
 #endif
 
 // Override new and delete to force 16-byte alignment on all platforms
+#if !defined(GAMEMATH_NO_MEMORY_OPERATORS)
 GAMEMATH_INLINE void* operator new(size_t size)
 {
 	void *result = ALIGNED_MALLOC(size);
@@ -55,6 +56,7 @@ GAMEMATH_INLINE void operator delete[](void *ptr)
 {
 	ALIGNED_FREE(ptr);
 }
+#endif // GAMEMATH_NO_MEMORY_OPERATORS
 
 GAMEMATH_NAMESPACE_BEGIN
 class Vector4;
