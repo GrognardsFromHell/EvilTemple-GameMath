@@ -79,6 +79,11 @@ public:
 	 *					matrix.
 	 */
 	static Matrix4 transformation(const Vector4 &scale, const Quaternion &rotation, const Vector4 &translation);
+
+	/**
+	 * Creates a 3D scaling matrix from the given quaternion.
+	 */
+	static Matrix4 rotation(const Quaternion &rotation);
 	
 	/**
 	 * Creates a viewing matrix, that is equivalent to the matrix created by gluLookAt.

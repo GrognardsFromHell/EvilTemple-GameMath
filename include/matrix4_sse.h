@@ -161,6 +161,29 @@ GAMEMATH_INLINE Matrix4 Matrix4::transformation(const Vector4 &scale,
 	return result;
 }
 
+GAMEMATH_INLINE Matrix4 Matrix4::rotation(const Quaternion &rotation)
+{
+	Matrix4 result;
+	result.setToZero();
+
+	// Rotation
+	result.m[0][0] = (1 - 2 * rotation.y() * rotation.y() - 2 * rotation.z() * rotation.z());
+	result.m[0][1] = (2 * rotation.x() * rotation.y() + 2 * rotation.w() * rotation.z());
+	result.m[0][2] = (2 * rotation.x() * rotation.z() - 2 * rotation.w() * rotation.y());
+
+	result.m[1][0] = (2 * rotation.x() * rotation.y() - 2 * rotation.w() * rotation.z());
+	result.m[1][1] = (1 - 2 * rotation.x() * rotation.x() - 2 * rotation.z() * rotation.z());
+	result.m[1][2] = (2 * rotation.y() * rotation.z() + 2 * rotation.w() * rotation.x());
+
+	result.m[2][0] = (2 * rotation.x() * rotation.z() + 2 * rotation.w() * rotation.y());
+	result.m[2][1] = (2 * rotation.y() * rotation.z() - 2 * rotation.w() * rotation.x());
+	result.m[2][2] = (1 - 2 * rotation.x() * rotation.x() - 2 * rotation.y() * rotation.y());
+
+	result.m[3][3] = 1;
+
+	return result;
+}
+
 GAMEMATH_INLINE Matrix4 operator *(const Matrix4 &m1, const Matrix4 &m2)
 {
 	__m128 resultColumn;
