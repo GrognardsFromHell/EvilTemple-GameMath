@@ -139,6 +139,11 @@ public:
 	 */
 	Matrix4 inverted() const;
 
+	/**
+	 * Returns an identity matrix.
+	 */
+	static Matrix4 identity();
+
 	void print() const;	
 
 	/**
@@ -304,6 +309,13 @@ GAMEMATH_INLINE Matrix4 Matrix4::transposed() const
 		}
 	}
 
+	return result;
+}
+
+GAMEMATH_INLINE Matrix4 Matrix4::identity()
+{
+	Matrix4 result;
+	result.setToIdentity();
 	return result;
 }
 
