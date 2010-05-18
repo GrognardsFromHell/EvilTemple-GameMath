@@ -38,6 +38,26 @@ public:
 	float w() const;
 
 	/**
+	 * Changes the X component of this vector.
+	 */
+	void setX(float x);
+
+	/**
+	 * Changes the Y component of this vector.
+	 */
+	void setY(float y);
+
+	/**
+	 * Changes the Z component of this vector.
+	 */
+	void setZ(float z);
+
+	/**
+	 * Changes the W component of this vector.
+	 */
+	void setW(float w);
+
+	/**
 	 * Computes the squared length of this vector. This method is significantly
 	 * faster than computing the normal length, since the square root can be omitted.
 	 */
@@ -139,6 +159,26 @@ GAMEMATH_INLINE float Vector4::z() const
 GAMEMATH_INLINE float Vector4::w() const 
 {
 	return mW;
+}
+
+GAMEMATH_INLINE void Vector4::setX(float x)
+{
+	mX = x;
+}
+
+GAMEMATH_INLINE void Vector4::setY(float y)
+{
+	mY = y;
+}
+
+GAMEMATH_INLINE void Vector4::setZ(float z)
+{
+	mZ = z;
+}
+
+GAMEMATH_INLINE void Vector4::setW(float w)
+{
+	mW = w;
 }
 
 GAMEMATH_INLINE const float *Vector4::data() const
