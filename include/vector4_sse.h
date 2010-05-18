@@ -97,7 +97,19 @@ GAMEMATH_INLINE Vector4 &Vector4::normalizeEstimated()
 
 GAMEMATH_INLINE Vector4 Vector4::normalized() const
 {
-	return *this;
+	__m128 length = _dot_product(mSse, mSse);
+
+	// Then take the square root of the lowest vector component
+	length = _mm_sqrt_ss(length);
+
+	// Splat the length into each vector component
+	length = _mm_shuffle_ps(length, length, _MM_SHUFFLE(0, 0, 0, 0));
+
+	// The last normalization step is dividing each component of this vector, by its length
+	Vector4 result;
+	result.mSse = _mm_div_ps(mSse, length);
+
+	return result;
 }
 
 GAMEMATH_INLINE float Vector4::dot(const Vector4 &vector) const
