@@ -6,6 +6,10 @@
 GAMEMATH_NAMESPACE_BEGIN
 
 class Quaternion {
+friend GAMEMATH_INLINE Quaternion operator +(const Quaternion &a, const Quaternion &b);
+friend GAMEMATH_INLINE Quaternion operator -(const Quaternion &a, const Quaternion &b);
+friend GAMEMATH_INLINE Quaternion operator *(const float, const Quaternion &vector);
+friend GAMEMATH_INLINE Quaternion operator *(const Quaternion &vector, const float);
 public:
 
 	/**

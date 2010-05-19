@@ -38,4 +38,35 @@ GAMEMATH_INLINE float Quaternion::angle() const
 	return (float)(std::acos((double)mW) * 2.0);
 }
 
+
+GAMEMATH_INLINE Quaternion operator +(const Quaternion &a, const Quaternion &b)
+{
+	Quaternion result;
+	result.mSse = _mm_add_ps(a.mSse, b.mSse);
+	return result;
+}
+
+GAMEMATH_INLINE Quaternion operator -(const Quaternion &a, const Quaternion &b)
+{
+	Quaternion result;
+	result.mSse = _mm_sub_ps(a.mSse, b.mSse);
+	return result;
+}
+
+GAMEMATH_INLINE Quaternion operator *(const float factor, const Quaternion &vector)
+{
+	__m128 factorVector = _mm_set_ps(1, factor, factor, factor);
+	Quaternion result;
+	result.mSse = _mm_mul_ps(vector.mSse, factorVector);
+	return result;
+}
+
+GAMEMATH_INLINE Quaternion operator *(const Quaternion &vector, const float factor)
+{
+	__m128 factorVector = _mm_set_ps(1, factor, factor, factor);
+	Quaternion result;
+	result.mSse = _mm_mul_ps(vector.mSse, factorVector);
+	return result;
+}
+
 GAMEMATH_NAMESPACE_END
