@@ -69,4 +69,78 @@ GAMEMATH_INLINE Quaternion operator *(const Quaternion &vector, const float fact
 	return result;
 }
 
+
+GAMEMATH_INLINE float Quaternion::length() const
+{
+	// Compute the square root (only of the lowest fp value)
+	__m128 length = _mm_sqrt_ss(_dot_product(mSse, mSse));
+	
+	return _get_lower_register(length);
+}
+
+GAMEMATH_INLINE float Quaternion::lengthSquared() const
+{
+	return dot(*this);
+}
+
+GAMEMATH_INLINE Quaternion &Quaternion::normalize()
+{
+	__m128 length = _dot_product(mSse, mSse);
+
+	// Then take the square root of the lowest vector component
+	length = _mm_sqrt_ss(length);
+
+	// Splat the length into each vector component
+	length = _mm_shuffle_ps(length, length, _MM_SHUFFLE(0, 0, 0, 0));
+
+	// The last normalization step is dividing each component of this vector, by its length
+	mSse = _mm_div_ps(mSse, length);
+
+	// TODO: What to do for nearly length0 vectors
+
+	return *this;
+}
+
+GAMEMATH_INLINE Quaternion &Quaternion::normalizeEstimated()
+{
+	__m128 length = _dot_product(mSse, mSse);
+
+	// Then take the square root of each vector component
+	length = _mm_rsqrt_ss(length);
+
+	// Splat the length into each vector component
+	length = _mm_shuffle_ps(length, length, _MM_SHUFFLE(0, 0, 0, 0));
+
+	// The last normalization step is dividing each component of this vector, by its length
+	mSse = _mm_mul_ps(mSse, length);
+
+	// TODO: What to do for nearly length0 vectors
+
+	return *this;
+}
+
+GAMEMATH_INLINE Quaternion Quaternion::normalized() const
+{
+	__m128 length = _dot_product(mSse, mSse);
+
+	// Then take the square root of the lowest vector component
+	length = _mm_sqrt_ss(length);
+
+	// Splat the length into each vector component
+	length = _mm_shuffle_ps(length, length, _MM_SHUFFLE(0, 0, 0, 0));
+
+	// The last normalization step is dividing each component of this vector, by its length
+	Quaternion result;
+	result.mSse = _mm_div_ps(mSse, length);
+
+	return result;
+}
+
+GAMEMATH_INLINE float Quaternion::dot(const Quaternion &vector) const
+{
+	const __m128 dotProduct = _dot_product(mSse, vector.mSse);
+
+	return _get_lower_register(dotProduct);
+}
+
 GAMEMATH_NAMESPACE_END

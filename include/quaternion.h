@@ -68,6 +68,38 @@ public:
 	static Quaternion fromAxisAndAngle(const float x, const float y, const float z, const float angle);
 
 	/**
+	 * Computes the squared length of this quaternion. This method is significantly
+	 * faster than computing the normal length, since the square root can be omitted.
+	 */
+	float lengthSquared() const;
+
+	/**
+	 * Computes this quaternion's length.
+	 */
+	float length() const;
+
+	/**
+	 * Normalizes this quaternion by dividing its components by its length.
+	 */
+	Quaternion &normalize();
+
+	/**
+	 * Normalizes using a reciprocal square root, which only has 11-bit precision. Use this if the
+	 * result doesn't need to be very precisely normalized.
+	 */
+	Quaternion &normalizeEstimated();
+
+	/**
+	 * Normalizes this vector and returns it in a new object, while leaving this object untouched.
+	 */
+	Quaternion normalized() const;
+
+	/**
+	 * Computes the dot product between this and another quaternion.
+	 */
+	float dot(const Quaternion  &vector) const;
+
+	/**
 	 * Retrieve the angle of rotation from this quaternion by applying cos^-1 to the scalar and multiplying with two.
 	 */
 	float angle() const;
