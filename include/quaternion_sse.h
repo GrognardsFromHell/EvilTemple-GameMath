@@ -55,7 +55,7 @@ GAMEMATH_INLINE Quaternion operator -(const Quaternion &a, const Quaternion &b)
 
 GAMEMATH_INLINE Quaternion operator *(const float factor, const Quaternion &vector)
 {
-	__m128 factorVector = _mm_set_ps(1, factor, factor, factor);
+	__m128 factorVector = _mm_set_ps(factor, factor, factor, factor);
 	Quaternion result;
 	result.mSse = _mm_mul_ps(vector.mSse, factorVector);
 	return result;
@@ -63,7 +63,7 @@ GAMEMATH_INLINE Quaternion operator *(const float factor, const Quaternion &vect
 
 GAMEMATH_INLINE Quaternion operator *(const Quaternion &vector, const float factor)
 {
-	__m128 factorVector = _mm_set_ps(1, factor, factor, factor);
+	__m128 factorVector = _mm_set_ps(factor, factor, factor, factor);
 	Quaternion result;
 	result.mSse = _mm_mul_ps(vector.mSse, factorVector);
 	return result;
