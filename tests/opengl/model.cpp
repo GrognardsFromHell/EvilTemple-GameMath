@@ -1,9 +1,26 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <QtCore/QStringList>
+#include <QtCore/QDataStream>
+
 #include "model.h"
 
 #include <stdio.h>
+
+enum ChunkTypes {
+    Textures = 1,
+    Materials = 2,
+	MaterialReferences = 3,
+    Geometry = 4,
+    Faces = 5,
+    Bones = 6, // Skeletal data
+    BoneAttachments = 7, // Assigns vertices to bones
+    BoundingVolumes = 8, // Bounding volumes,
+    Animations = 9, // Animations
+    Metadata = 0xFFFF,  // Last chunk is always metadata
+    UserChunk = 0x10000, // This gives plenty of room. 16-bit are reserved for application chunks
+};
 
 Model::Model()
 	: faceGroups(0), positions(0), normals(0), texCoords(0), vertices(0), vertexData(0), faceData(0)
@@ -123,7 +140,7 @@ bool Model::open(const char *filename, const RenderStates &renderState)
 			return false;
 		}
 
-		if (chunkHeader.type == 1) {
+		if (chunkHeader.type == Textures) {
 			textureData = chunkData;
 
 			unsigned int textureCount = *(unsigned int*)textureData;
@@ -141,7 +158,7 @@ bool Model::open(const char *filename, const RenderStates &renderState)
 				texturesSize[j] = size;
 				ptr += size;
 			}
-		} else if (chunkHeader.type == 2) {
+		} else if (chunkHeader.type == Materials) {
 			unsigned int count = *(unsigned int*)chunkData;
 			materialState = new MaterialState[count];
 
@@ -172,10 +189,39 @@ bool Model::open(const char *filename, const RenderStates &renderState)
 			}
 
 			ALIGNED_FREE(chunkData);
-		} else if (chunkHeader.type == 3) {
+        } else if (chunkHeader.type == MaterialReferences) {
+
+            QDataStream stream(QByteArray::fromRawData((const char*)chunkData, chunkHeader.size));
+            stream.setByteOrder(QDataStream::LittleEndian);
+            stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+
+            QStringList materialNames;
+            stream >> materialNames;
+
+            materialState = new MaterialState[materialNames.size()];
+
+            ModelTextureSource textureSource(textures, texturesSize);
+
+			for (int j = 0; j < materialNames.size(); ++j) {
+				Material material;
+
+				if (!material.loadFromFile(materialNames[j])) {
+					mError.append(QString("Unable to read material from model %1:\n%2").arg(filename)
+						.arg(material.error()));
+					return false;
+				}
+
+				if (!materialState[j].createFrom(material, renderState, &textureSource)) {
+					mError.append(QString("Unable to create material state for model %1:\n%2").arg(filename)
+						.arg(materialState[j].error()));
+					return false;
+				}
+			}
+
+		} else if (chunkHeader.type == Geometry) {
 			vertexData = chunkData;
 			loadVertexData();
-		} else if (chunkHeader.type == 4) {
+		} else if (chunkHeader.type == Faces) {
 			faceData = chunkData;
 			loadFaceData();
 		} else {

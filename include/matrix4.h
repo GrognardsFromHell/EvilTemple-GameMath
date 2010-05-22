@@ -29,6 +29,12 @@ public:
 	 */
 	const float *data() const;
 
+    /**
+    Returns a column of this matrix reinterpreted as a 4 component vector.
+    This operation has no cost, since it simply casts a pointer.
+    */
+    const Vector4 *column(int col) const;
+
 	/**
 	 * Returns the internal data of this matrix as a column-major array of 16 floating point values.
 	 *
@@ -322,6 +328,11 @@ GAMEMATH_INLINE Matrix4 Matrix4::identity()
 	Matrix4 result;
 	result.setToIdentity();
 	return result;
+}
+
+GAMEMATH_INLINE const Vector4 *Matrix4::column(int col) const
+{
+    return reinterpret_cast<const Vector4*>(columns + col);
 }
 
 GAMEMATH_NAMESPACE_END
