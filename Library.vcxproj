@@ -64,6 +64,7 @@
     <ClInclude Include="include\box3d.h" />
     <ClInclude Include="include\box3d_sisd.h" />
     <ClInclude Include="include\box3d_sse.h" />
+    <ClInclude Include="include\frustum.h" />
     <ClInclude Include="include\gamemath.h" />
     <ClInclude Include="include\gamemath_constants.h" />
     <ClInclude Include="include\gamemath_internal.h" />
