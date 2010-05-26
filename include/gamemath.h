@@ -8,5 +8,6 @@
 #include "box2d.h"
 #include "box3d.h"
 #include "ray3d.h"
+#include "frustum.h"
 
 #endif // GAMEMATH_H
