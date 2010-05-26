@@ -6,8 +6,8 @@ GAMEMATH_NAMESPACE_BEGIN
 
 GAMEMATH_INLINE void Box3d::setToInfinity()
 {
-    *reinterpret_cast<__m128*>(&mMinimum) = _mm_load_ps(reinterpret_cast<const float*>(NegativeInfinity));
-    *reinterpret_cast<__m128*>(&mMaximum) = _mm_load_ps(reinterpret_cast<const float*>(PositiveInfinity));
+    mMinimum.mSse = _mm_load_ps(NegativeInfinity);
+    mMaximum.mSse = _mm_load_ps(PositiveInfinity);
 }
 
 GAMEMATH_NAMESPACE_END

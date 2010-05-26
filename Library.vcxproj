@@ -73,6 +73,8 @@
     <ClInclude Include="include\quaternion.h" />
     <ClInclude Include="include\quaternion_sisd.h" />
     <ClInclude Include="include\quaternion_sse.h" />
+    <ClInclude Include="include\ray3d.h" />
+    <ClInclude Include="include\ray3d_sse.h" />
     <ClInclude Include="include\vector4.h" />
     <ClInclude Include="include\vector4_sisd.h" />
     <ClInclude Include="include\vector4_sse.h" />

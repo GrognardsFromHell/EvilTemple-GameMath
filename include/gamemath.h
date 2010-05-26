@@ -7,5 +7,6 @@
 #include "matrix4.h"
 #include "box2d.h"
 #include "box3d.h"
+#include "ray3d.h"
 
 #endif // GAMEMATH_H

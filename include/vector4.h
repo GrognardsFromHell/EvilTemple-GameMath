@@ -12,6 +12,8 @@ friend GAMEMATH_INLINE Vector4 operator +(const Vector4 &a, const Vector4 &b);
 friend GAMEMATH_INLINE Vector4 operator -(const Vector4 &a, const Vector4 &b);
 friend GAMEMATH_INLINE Vector4 operator *(const float, const Vector4 &vector);
 friend GAMEMATH_INLINE Vector4 operator *(const Vector4 &vector, const float);
+friend class Ray3d;
+friend class Box3d;
 public:
 	Vector4();
 	Vector4(const float x, const float y, const float z, const float w);

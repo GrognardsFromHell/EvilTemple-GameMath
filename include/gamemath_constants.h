@@ -4,6 +4,8 @@
 
 #include "gamemath_internal.h"
 
+#include <limits>
+
 // Define several constants used by the intrinsic math methods
 GAMEMATH_NAMESPACE_BEGIN
 
@@ -34,10 +36,15 @@ GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int CoordinateMaskY[4
 GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int CoordinateMaskZ[4] = { 0x00000000, 0x00000000, 0xFFFFFFFF, 0x00000000 };
 
 // Positive infinity
-GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int PositiveInfinity[4] = { 0x7F800000, 0x7F800000, 0x7F800000, 0x7F800000 };
-
+GAMEMATH_ALIGN extern const __declspec(selectany) float PositiveInfinity[4] = { std::numeric_limits<float>::infinity(), 
+                                                                                std::numeric_limits<float>::infinity(), 
+                                                                                std::numeric_limits<float>::infinity(), 
+                                                                                std::numeric_limits<float>::infinity() };
 // Negative infinity
-GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int NegativeInfinity[4] = { 0xFF800000, 0xFF800000, 0xFF800000, 0xFF800000 };
+GAMEMATH_ALIGN extern const __declspec(selectany) float NegativeInfinity[4] = { -std::numeric_limits<float>::infinity(), 
+                                                                                -std::numeric_limits<float>::infinity(), 
+                                                                                -std::numeric_limits<float>::infinity(), 
+                                                                                -std::numeric_limits<float>::infinity() };
 
 #endif
 
