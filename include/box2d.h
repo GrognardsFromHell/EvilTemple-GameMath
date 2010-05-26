@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "gamemath.h"
+#include "gamemath_internal.h"
 
 GAMEMATH_NAMESPACE_BEGIN
 

@@ -1,6 +1,7 @@
 
 // This is for IDEs only
-#include "gamemath.h"
+#include "gamemath_internal.h"
+#include "vector4.h"
 
 #if !defined(VECTOR4_H)
 #error "Do not include this file directly, only include vector4.h"
@@ -194,6 +195,25 @@ GAMEMATH_INLINE Vector4 &Vector4::operator *=(const float factor)
 	__m128 factorVector = _mm_set_ps(1, factor, factor, factor);
 	mSse = _mm_mul_ps(mSse, factorVector);
 	return *this;
+}
+
+GAMEMATH_INLINE Vector4 Vector4::absolute() const
+{
+    Vector4 result;
+    __m128 invSignMask = _mm_load_ps(reinterpret_cast<const float*>(InvertedSignmask));
+    result.mSse = _mm_and_ps(invSignMask, mSse);
+    return result;
+}
+
+GAMEMATH_INLINE bool Vector4::isInfinite() const
+{
+    Vector4 tmp = absolute();
+
+    __m128 posInf = _mm_load_ps(reinterpret_cast<const float*>(PositiveInfinity));
+
+    __m128 res = _mm_cmpeq_ps(posInf, tmp.mSse);
+
+    return (_mm_movemask_ps(res) != 0);
 }
 
 GAMEMATH_NAMESPACE_END

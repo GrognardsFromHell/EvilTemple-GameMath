@@ -2,7 +2,6 @@
 #define GAMEMATH_NO_INTRINSICS
 #include "../common/common.h"
 
-#include <limits>
 #include <cstdio>
 
 using namespace GameMath;

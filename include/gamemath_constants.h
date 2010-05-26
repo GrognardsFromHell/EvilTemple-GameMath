@@ -2,21 +2,21 @@
 #if !defined(GAMEMATH_CONSTANTS_H)
 #define GAMEMATH_CONSTANTS_H
 
-#include "gamemath.h"
+#include "gamemath_internal.h"
 
 // Define several constants used by the intrinsic math methods
 GAMEMATH_NAMESPACE_BEGIN
 
 #if !defined(GAMEMATH_NO_INTRINSICS)
 
-// A vector of positive infinity
-GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int PositiveInfinity[4] = { 0x7F800000, 0x7F800000, 0x7F800000, 0x7F800000 };
-
 // The first bit of an IEEE floating point number is the sign bit.
 GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int SignMask[4] = { 0x80000000, 0x80000000, 0x80000000, 0x80000000 };
 
 // Applies sign-bit masking only to the X, Y, and Z components
 GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int SignMaskXYZ[4] = { 0x80000000, 0x80000000, 0x80000000, 0x00000000 };
+
+// All bits except the first bit (Sign Bit) are set. Can be used to make a floating point number absolute.
+GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int InvertedSignmask[4] = { 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF };
 
 // The columns of the identity matrix.
 GAMEMATH_ALIGN extern const __declspec(selectany) float IdentityCol1[4] = {1, 0, 0, 0};
@@ -32,6 +32,12 @@ GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int CoordinateMaskY[4
 
 // A mask for the Z coordinate of a Vector4
 GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int CoordinateMaskZ[4] = { 0x00000000, 0x00000000, 0xFFFFFFFF, 0x00000000 };
+
+// Positive infinity
+GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int PositiveInfinity[4] = { 0x7F800000, 0x7F800000, 0x7F800000, 0x7F800000 };
+
+// Negative infinity
+GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int NegativeInfinity[4] = { 0xFF800000, 0xFF800000, 0xFF800000, 0xFF800000 };
 
 #endif
 

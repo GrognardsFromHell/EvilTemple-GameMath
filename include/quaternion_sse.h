@@ -1,5 +1,6 @@
 
-#include "gamemath.h"
+#include "gamemath_internal.h"
+#include "quaternion.h"
 
 #if !defined(QUATERNION_H)
 #define QUATERNION_H

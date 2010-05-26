@@ -1,7 +1,7 @@
 #ifndef VECTOR4_H
 #define VECTOR4_H
 
-#include "gamemath.h"
+#include "gamemath_internal.h"
 
 GAMEMATH_NAMESPACE_BEGIN
 
@@ -88,6 +88,16 @@ public:
 	 * Computes the dot product between this and another vector.
 	 */
 	float dot(const Vector4 &vector) const;
+
+    /**
+      Returns the absolute of this vector.
+      */
+    Vector4 absolute() const;
+
+    /**
+      Returns true if one of the components of this vector are negative or positive infinity.
+      */
+    bool isInfinite() const;
 
 	/**
 	 * Computes the three-dimensional cross product of two vectors, interpreting both vectors as directional vectors

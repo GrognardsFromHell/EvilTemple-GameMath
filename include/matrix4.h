@@ -3,7 +3,9 @@
 
 #include <cstdio>
 
-#include "gamemath.h"
+#include "gamemath_internal.h"
+#include "vector4.h"
+#include "quaternion.h"
 
 GAMEMATH_NAMESPACE_BEGIN
 
@@ -332,7 +334,7 @@ GAMEMATH_INLINE Matrix4 Matrix4::identity()
 
 GAMEMATH_INLINE const Vector4 &Matrix4::column(int col) const
 {
-    return reinterpret_cast<const Vector4&>(columns[col]);
+    return reinterpret_cast<const Vector4&>(m[col]);
 }
 
 GAMEMATH_NAMESPACE_END

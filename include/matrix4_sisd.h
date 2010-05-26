@@ -1,6 +1,7 @@
 
 // This is for IDEs only
-#include "gamemath.h"
+#include "gamemath_internal.h"
+#include "quaternion.h"
 
 #if !defined(MATRIX4_H)
 #error "Do not include this file directly, only include matrix4.h"

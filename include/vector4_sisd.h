@@ -1,12 +1,14 @@
 
 // This is for IDEs only
-#include "gamemath.h"
+#include "gamemath_internal.h"
+#include "vector4.h"
 
 #if !defined(VECTOR4_H)
 #error "Do not include this file directly, only include vector4.h"
 #endif
 
 #include <cmath>
+#include <limits>
 
 GAMEMATH_NAMESPACE_BEGIN
 
@@ -104,6 +106,21 @@ GAMEMATH_INLINE Vector4 operator -(const Vector4 &a, const Vector4 &b)
 GAMEMATH_INLINE Vector4 Vector4::operator -() const
 {
 	return Vector4(-mX, -mY, -mZ, -mW);
+}
+
+GAMEMATH_INLINE Vector4 Vector4::absolute() const
+{
+    return Vector4(std::fabs(mX), std::fabs(mY), std::fabs(mZ), std::fabs(mW));
+}
+
+GAMEMATH_INLINE bool Vector4::isInfinite() const
+{
+    const float inf = std::numeric_limits<float>::infinity();
+
+    return std::fabs(mX) == inf
+        || std::fabs(mY) == inf
+        || std::fabs(mZ) == inf
+        || std::fabs(mW) == inf;
 }
 
 GAMEMATH_NAMESPACE_END

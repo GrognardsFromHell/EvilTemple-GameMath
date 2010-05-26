@@ -1,5 +1,6 @@
 
-#include "gamemath.h"
+#include "gamemath_internal.h"
+#include "quaternion.h"
 
 #include <cmath>
 

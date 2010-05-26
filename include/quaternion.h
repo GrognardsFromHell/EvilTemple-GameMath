@@ -1,7 +1,7 @@
 #ifndef QUATERNION_H
 #define QUATERNION_H
 
-#include "gamemath.h"
+#include "gamemath_internal.h"
 
 GAMEMATH_NAMESPACE_BEGIN
 
