@@ -48,8 +48,7 @@ int main(int argc, char *argv[])
 	COMPARE(resVec.y(), 1.0f);
 	COMPARE(resVec.z(), 1.5f);
 	COMPARE(resVec.w(), 4.0f);
-
-
+    
 	Vector4 c = - result[0];
 	printf("%f %f %f %f\n", c.x(), c.y(), c.z(), c.w());
 
