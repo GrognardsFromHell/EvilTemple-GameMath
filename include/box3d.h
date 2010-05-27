@@ -57,17 +57,6 @@ GAMEMATH_INLINE Box3d::Box3d(const Vector4 &minimum, const Vector4 &maximum)
 {
 }
 
-GAMEMATH_INLINE Box3d Box3d::transformAffine(const Matrix4 &matrix) const
-{
-    Vector4 halfSize = 0.5f * (mMaximum - mMinimum);
-    Vector4 center = mMinimum + halfSize;
-
-    Vector4 newCenter = matrix.mapPosition(center);
-    Vector4 newHalfSize = matrix.mapNormal(halfSize);
-
-    return Box3d(newCenter - newHalfSize, newCenter + newHalfSize);
-}
-
 GAMEMATH_INLINE void Box3d::merge(const Box3d &other)
 {
     if (other.mMinimum.x() < mMinimum.x())
