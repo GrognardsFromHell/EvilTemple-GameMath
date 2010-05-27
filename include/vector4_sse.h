@@ -216,4 +216,9 @@ GAMEMATH_INLINE bool Vector4::isInfinite() const
     return (_mm_movemask_ps(res) != 0);
 }
 
+GAMEMATH_INLINE bool Vector4::operator ==(const Vector4 &other) const
+{
+    return _mm_movemask_ps(_mm_cmpeq_ps(mSse, other.mSse)) == 0xF;
+}
+
 GAMEMATH_NAMESPACE_END

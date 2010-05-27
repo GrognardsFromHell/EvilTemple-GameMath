@@ -123,4 +123,9 @@ GAMEMATH_INLINE bool Vector4::isInfinite() const
         || std::fabs(mW) == inf;
 }
 
+GAMEMATH_INLINE bool Vector4::operator ==(const Vector4 &other) const
+{
+    return mX == other.mX && mY == other.mY && mZ == other.mZ && mW == other.mW;
+}
+
 GAMEMATH_NAMESPACE_END

@@ -26,9 +26,14 @@ public:
       */
     Box3d transformAffine(const Matrix4 &matrix) const;
 
+    /**
+    mMinimum is equal to mMaximum.
+    */
+    bool isNull() const;
+
     void setToInfinity();
 
-    bool isInfinite();
+    bool isInfinite() const;
     
     void merge(const Box3d &other);
 
@@ -72,12 +77,12 @@ GAMEMATH_INLINE void Box3d::merge(const Box3d &other)
     if (other.mMinimum.z() < mMinimum.z())
         mMinimum.setZ(other.mMinimum.z());
 
-    if (other.mMinimum.x() > mMinimum.x())
-        mMinimum.setX(other.mMinimum.x());
-    if (other.mMinimum.y() > mMinimum.y())
-        mMinimum.setY(other.mMinimum.y());
-    if (other.mMinimum.z() > mMinimum.z())
-        mMinimum.setZ(other.mMinimum.z());
+    if (other.mMaximum.x() > mMaximum.x())
+        mMaximum.setX(other.mMaximum.x());
+    if (other.mMaximum.y() > mMaximum.y())
+        mMaximum.setY(other.mMaximum.y());
+    if (other.mMaximum.z() > mMaximum.z())
+        mMaximum.setZ(other.mMaximum.z());
 }
 
 GAMEMATH_INLINE void Box3d::merge(const Vector4 &point)
@@ -125,6 +130,11 @@ GAMEMATH_INLINE void Box3d::setMaximum(const Vector4 &maximum)
     mMaximum = maximum;
 }
 
+GAMEMATH_INLINE bool Box3d::isNull() const
+{
+    return mMinimum == mMaximum;
+}
+
 GAMEMATH_INLINE bool Box3d::intersects(const Box3d &other) const
 {
     // TODO: This can be SSE accelerated
@@ -151,7 +161,7 @@ GAMEMATH_INLINE bool Box3d::contains(const Vector4 &point) const
         );
 }
 
-GAMEMATH_INLINE bool Box3d::isInfinite()
+GAMEMATH_INLINE bool Box3d::isInfinite() const
 {
     return mMinimum.isInfinite() || mMaximum.isInfinite();
 }

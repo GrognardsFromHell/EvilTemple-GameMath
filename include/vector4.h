@@ -130,6 +130,11 @@ public:
 	 */
 	Vector4 operator -() const;
 
+    /**
+      Checks two vectors for equality.
+      */
+    bool operator ==(const Vector4 &other) const;
+
 	const float *data() const;
 
 	float *data();
