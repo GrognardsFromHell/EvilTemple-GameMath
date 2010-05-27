@@ -8,7 +8,7 @@
 #endif
 
 GAMEMATH_NAMESPACE_BEGIN
-
+    
 GAMEMATH_INLINE Matrix4 &Matrix4::scale(const Vector4 &vector)
 {
 	columns[0] = _mm_mul_ps(columns[0], _mm_shuffle_ps(vector.mSse, vector.mSse, _MM_SHUFFLE(0, 0, 0, 0)));

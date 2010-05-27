@@ -18,6 +18,10 @@ public:
 	Vector4();
 	Vector4(const float x, const float y, const float z, const float w);
 
+#if !defined(GAMEMATH_NO_INTRINSICS)
+    Vector4(const __m128 value);
+#endif
+
 	/**
 	 * Returns the x component of this vector.
 	 */
@@ -129,6 +133,10 @@ public:
 	 * Returns a negated version of this vector, negating only the x, y, and z components.
 	 */
 	Vector4 operator -() const;
+
+#if !defined(GAMEMATH_NO_INTRINSICS)
+    operator __m128() const;
+#endif
 
     /**
       Checks two vectors for equality.

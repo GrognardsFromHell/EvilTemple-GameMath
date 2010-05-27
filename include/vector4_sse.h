@@ -18,6 +18,15 @@ GAMEMATH_INLINE Vector4::Vector4(const float x, const float y, const float z, co
 {
 }
 
+GAMEMATH_INLINE Vector4::Vector4(const __m128 value) : mSse(value)
+{
+}
+
+GAMEMATH_INLINE Vector4::operator __m128() const
+{
+    return mSse;
+}
+
 /**
  * Computes the dot product of two vectors a and b and stores the result in r0
  * of an SSE register, and returns the register.
