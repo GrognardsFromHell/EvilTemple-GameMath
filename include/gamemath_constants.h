@@ -26,6 +26,9 @@ GAMEMATH_ALIGN extern const __declspec(selectany) float IdentityCol2[4] = {0, 1,
 GAMEMATH_ALIGN extern const __declspec(selectany) float IdentityCol3[4] = {0, 0, 1, 0};
 GAMEMATH_ALIGN extern const __declspec(selectany) float IdentityCol4[4] = {0, 0, 0, 1};
 
+// Factor used in construction of transformation matrices
+GAMEMATH_ALIGN extern const __declspec(selectany) float FactorTwo[4] = {2, 2, 2, 2};
+
 // A mask for the X coordinate of a Vector4
 GAMEMATH_ALIGN extern const __declspec(selectany) unsigned int CoordinateMaskX[4] = { 0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000 };
 

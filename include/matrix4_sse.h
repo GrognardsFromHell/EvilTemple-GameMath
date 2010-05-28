@@ -137,39 +137,39 @@ GAMEMATH_INLINE Matrix4 Matrix4::transformation(const Vector4 &scale,
 	const Quaternion &rotation, 
 	const Vector4 &translation)
 {
-	Matrix4 result;
+    Matrix4 result;
+
+    __m128 doubledScale = _mm_mul_ps(_mm_load_ps(FactorTwo), scale);
 
     // Splat X scale into vector
-    __m128 scaleFac = _mm_shuffle_ps(scale, scale, _MM_SHUFFLE(0, 0, 0, 0));
+    __m128 scaleFac = _mm_shuffle_ps(doubledScale, doubledScale, _MM_SHUFFLE(0, 0, 0, 0));
 
-	// Rotation
-	result.m[0][0] = (1 - 2 * rotation.y() * rotation.y() - 2 * rotation.z() * rotation.z());
-	result.m[0][1] = (2 * rotation.x() * rotation.y() + 2 * rotation.w() * rotation.z());
-	result.m[0][2] = (2 * rotation.x() * rotation.z() - 2 * rotation.w() * rotation.y());
+    // Rotation
+    result.m[0][0] = 0.5f - rotation.y() * rotation.y() - rotation.z() * rotation.z();
+    result.m[0][1] = rotation.x() * rotation.y() + rotation.w() * rotation.z();
+    result.m[0][2] = rotation.x() * rotation.z() - rotation.w() * rotation.y();
     result.m[0][3] = 0;
     result.columns[0] = _mm_mul_ps(result.columns[0], scaleFac);
 
-    scaleFac = _mm_shuffle_ps(scale, scale, _MM_SHUFFLE(1, 1, 1, 1));
-	result.m[1][0] = (2 * rotation.x() * rotation.y() - 2 * rotation.w() * rotation.z());
-	result.m[1][1] = (1 - 2 * rotation.x() * rotation.x() - 2 * rotation.z() * rotation.z());
-	result.m[1][2] = (2 * rotation.y() * rotation.z() + 2 * rotation.w() * rotation.x());
+    scaleFac = _mm_shuffle_ps(doubledScale, doubledScale, _MM_SHUFFLE(1, 1, 1, 1));
+    result.m[1][0] = rotation.x() * rotation.y() - rotation.w() * rotation.z();
+    result.m[1][1] = 0.5f - rotation.x() * rotation.x() - rotation.z() * rotation.z();
+    result.m[1][2] = rotation.y() * rotation.z() + rotation.w() * rotation.x();
     result.m[1][3] = 0;
     result.columns[1] = _mm_mul_ps(result.columns[1], scaleFac);
 
-    scaleFac = _mm_shuffle_ps(scale, scale, _MM_SHUFFLE(2, 2, 2, 2));
-	result.m[2][0] = (2 * rotation.x() * rotation.z() + 2 * rotation.w() * rotation.y());
-	result.m[2][1] = (2 * rotation.y() * rotation.z() - 2 * rotation.w() * rotation.x());
-	result.m[2][2] = (1 - 2 * rotation.x() * rotation.x() - 2 * rotation.y() * rotation.y());
+    scaleFac = _mm_shuffle_ps(doubledScale, doubledScale, _MM_SHUFFLE(2, 2, 2, 2));
+    result.m[2][0] = rotation.x() * rotation.z() + rotation.w() * rotation.y();
+    result.m[2][1] = rotation.y() * rotation.z() - rotation.w() * rotation.x();
+    result.m[2][2] = 0.5f - rotation.x() * rotation.x() - rotation.y() * rotation.y();
     result.m[2][3] = 0;
     result.columns[2] = _mm_mul_ps(result.columns[2], scaleFac);
 
-	// Translation
-	result.m[3][0] = translation.x();
-	result.m[3][1] = translation.y();
-	result.m[3][2] = translation.z();
-	result.m[3][3] = 1;
+    // Translation
+    result.columns[3] = translation.mSse;
+    result.m[3][3] = 1;
 
-	return result;
+    return result;
 }
 
 GAMEMATH_INLINE Matrix4 Matrix4::rotation(const Quaternion &rotation)
