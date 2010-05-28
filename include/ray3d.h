@@ -29,7 +29,7 @@ public:
     void setDirection(const Vector4 &direction);
 
     bool intersectsSphere(const Vector4 &sphereOrigin, float sphereRadiusSquare) const;
-    bool intersects(const Box3d &box, float &distance) const;
+    bool intersects(const Box3d &box) const;
     
 private:
     Vector4 mOrigin;

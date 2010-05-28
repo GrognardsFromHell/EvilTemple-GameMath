@@ -21,47 +21,33 @@ GAMEMATH_INLINE void Ray3d::setDirection(const Vector4 &direction)
   Based on work @ http://www.flipcode.com/archives/SSE_RayBox_Intersection_Test.shtml
   && http://www.uni-koblenz.de/~cg/publikationen/cp_raytrace.pdf
 */
-GAMEMATH_INLINE bool Ray3d::intersects(const Box3d &box, float &distance) const
+GAMEMATH_INLINE bool Ray3d::intersects(const Box3d &box) const
 {
-    __m128 l1 = _mm_mul_ps(_mm_sub_ps(box.minimum().mSse, mOrigin.mSse), mInvDirection.mSse);
-    __m128 l2 = _mm_mul_ps(_mm_sub_ps(box.maximum().mSse, mOrigin.mSse), mInvDirection.mSse);
+    const __m128 temp1 = _mm_mul_ps(_mm_sub_ps(box.minimum(), mOrigin), mInvDirection);
+    const __m128 temp2 = _mm_mul_ps(_mm_sub_ps(box.maximum(), mOrigin), mInvDirection);
 
-    __m128 posInf = _mm_load_ps(PositiveInfinity);
+    __m128 minVec = _mm_min_ps(temp1, temp2);
+    __m128 maxVec = _mm_max_ps(temp1, temp2);
 
-	// the order we use for those min/max is vital to filter out
-	// NaNs that happens when an inv_dir is +/- inf and
-	// (box_min - pos) is 0. inf * 0 = NaN
-    __m128 filtered_l1a = _mm_min_ps(l1, posInf);
-	__m128 filtered_l2a = _mm_min_ps(l2, posInf);
+    // This sse code tries to find the smallest component of a vector without branching
 
-    __m128 negInf = _mm_load_ps(NegativeInfinity);
+    // Get the y component into the lower reg
+    const __m128 minVecY = _mm_shuffle_ps(minVec, minVec, _MM_SHUFFLE(3, 2, 0, 1));
+    minVec = _mm_max_ss(minVec, minVecY); // r0 is max(minX,minY)
 
-	__m128 filtered_l1b = _mm_max_ps(l1, negInf);
-	__m128 filtered_l2b = _mm_max_ps(l2, negInf);
-        
-	// now that we're back on our feet, test those slabs.
-	__m128 lmax = _mm_max_ps(filtered_l1a, filtered_l2a);
-	__m128 lmin = _mm_min_ps(filtered_l1b, filtered_l2b);
+    const __m128 maxVecY = _mm_shuffle_ps(maxVec, maxVec, _MM_SHUFFLE(3, 2, 0, 1));
+    maxVec = _mm_min_ss(maxVec, maxVecY); // r0 is min(maxX,maxY)
 
-	// unfold back. try to hide the latency of the shufps & co.
-    const __m128 lmax0 = _mm_shuffle_ps(lmax, lmax, _MM_SHUFFLE(0, 3, 2, 1));
-	const __m128 lmin0 = _mm_shuffle_ps(lmin, lmin, _MM_SHUFFLE(0, 3, 2, 1));
-	lmax = _mm_min_ss(lmax, lmax0);
-	lmin = _mm_max_ss(lmin, lmin0);
+    const __m128 minVecZ = _mm_movehl_ps(minVec, minVec); // r0 is now r3 (which is minZ)
+    minVec = _mm_max_ss(minVec, minVecZ); // r0 is max(max(minX,minY),minZ)
 
-    bool intersects = _mm_comige_ss(lmax, _mm_setzero_ps()) && _mm_comige_ss(lmax, lmin);
+    const __m128 maxVecZ = _mm_movehl_ps(maxVec, maxVec); // r0 is now r3 (which is maxZ)
+    maxVec = _mm_min_ss(maxVec, maxVecZ); // r0 is min(min(maxX,maxY),maxZ)
 
-    float distanceFromOrigin;
+    if (_mm_comigt_ss(minVec, maxVec) || _mm_comilt_ss(maxVec, _mm_setzero_ps()))
+        return false;
 
-    if (intersects) {
-        _mm_store_ss(&distanceFromOrigin, lmin);
-
-        if (distanceFromOrigin < distance) {
-            distance = distanceFromOrigin;
-        }
-    }
-
-    return intersects;
+    return true;
 }
 
 GAMEMATH_NAMESPACE_END
