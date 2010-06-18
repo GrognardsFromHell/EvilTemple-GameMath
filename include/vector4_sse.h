@@ -156,7 +156,7 @@ GAMEMATH_INLINE Vector4 &Vector4::operator +=(const Vector4 &vector)
 	return *this;
 }
 
-GAMEMATH_INLINE Vector4 &Vector4::operator -(const Vector4 &vector)
+GAMEMATH_INLINE Vector4 &Vector4::operator -=(const Vector4 &vector)
 {
 	mSse = _mm_sub_ps(mSse, vector.mSse);
 	return *this;

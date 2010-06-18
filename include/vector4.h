@@ -127,7 +127,7 @@ public:
 	/**
 	 * Subtracts another vector from this vector.
 	 */
-	Vector4 &operator -(const Vector4 &vector);
+	Vector4 &operator -=(const Vector4 &vector);
 
 	/**
 	 * Returns a negated version of this vector, negating only the x, y, and z components.
