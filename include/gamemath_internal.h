@@ -44,7 +44,7 @@
 #endif
 
 // Override new and delete to force 16-byte alignment on all platforms
-#if !defined(GAMEMATH_NO_MEMORY_OPERATORS)
+#if defined(GAMEMATH_MEMORY_OPERATORS)
 GAMEMATH_INLINE void* operator new(size_t size)
 {
 	void *result = ALIGNED_MALLOC(size);
