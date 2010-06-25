@@ -9,7 +9,7 @@
 
 GAMEMATH_NAMESPACE_BEGIN
 
-GAMEMATH_ALIGN class Matrix4 {
+GAMEMATH_ALIGNEDTYPE_PRE class GAMEMATH_ALIGNEDTYPE_MID Matrix4 {
 friend GAMEMATH_INLINE Matrix4 operator *(const Matrix4 &a, const Matrix4 &b);
 public:
 	/**
@@ -175,7 +175,7 @@ private:
 #else
 	float m[4][4];
 #endif
-};
+} GAMEMATH_ALIGNEDTYPE_POST;
 
 GAMEMATH_INLINE const float *Matrix4::data() const
 {
