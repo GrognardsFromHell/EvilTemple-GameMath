@@ -10,7 +10,7 @@ GAMEMATH_NAMESPACE_BEGIN
 /**
  * Represents a two-dimensional box.
  */
-GAMEMATH_ALIGN class Box2d {
+GAMEMATH_ALIGNEDTYPE_PRE class GAMEMATH_ALIGNEDTYPE_MID Box2d {
 public:
 	/**
 	 * Constructs a two-dimensional box from its bounds.
@@ -36,7 +36,7 @@ private:
 	float mTop;
 	float mRight;
 	float mBottom;
-};
+} GAMEMATH_ALIGNEDTYPE_POST;
 
 GAMEMATH_INLINE Box2d::Box2d(float left, float top, float right, float bottom)
 	: mLeft(left), mTop(top), mRight(right), mBottom(bottom)

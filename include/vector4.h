@@ -5,7 +5,7 @@
 
 GAMEMATH_NAMESPACE_BEGIN
 
-GAMEMATH_ALIGN class Vector4
+GAMEMATH_ALIGNEDTYPE_PRE class GAMEMATH_ALIGNEDTYPE_MID Vector4
 {
 friend class Matrix4;
 friend GAMEMATH_INLINE Vector4 operator +(const Vector4 &a, const Vector4 &b);
@@ -164,7 +164,7 @@ private:
 	float mZ;
 	float mW;
 #endif // GAMEMATH_NO_INTRINSICS
-};
+} GAMEMATH_ALIGNEDTYPE_POST;
 
 GAMEMATH_INLINE float Vector4::x() const 
 {
