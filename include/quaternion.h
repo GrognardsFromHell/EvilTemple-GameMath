@@ -63,6 +63,26 @@ public:
 	float w() const;
 
 	/**
+	 * Changes the X component of this quaternion.
+	 */
+	void setX(float x);
+
+	/**
+	 * Changes the Y component of this quaternion.
+	 */
+	void setY(float y);
+
+	/**
+	 * Changes the Z component of this quaternion.
+	 */
+	void setZ(float z);
+
+	/**
+	 * Changes the W component of this quaternion.
+	 */
+	void setW(float w);    
+
+	/**
 	 * Creates a quaternion from a rotation axis and an angle expressed in radians.
 	 */
 	static Quaternion fromAxisAndAngle(const float x, const float y, const float z, const float angle);
@@ -146,6 +166,26 @@ GAMEMATH_INLINE float Quaternion::z() const
 GAMEMATH_INLINE float Quaternion::w() const 
 {
 	return mW;
+}
+
+GAMEMATH_INLINE void Quaternion::setX(float x)
+{
+	mX = x;
+}
+
+GAMEMATH_INLINE void Quaternion::setY(float y)
+{
+	mY = y;
+}
+
+GAMEMATH_INLINE void Quaternion::setZ(float z)
+{
+	mZ = z;
+}
+
+GAMEMATH_INLINE void Quaternion::setW(float w)
+{
+	mW = w;
 }
 
 GAMEMATH_INLINE const float *Quaternion::data() const
