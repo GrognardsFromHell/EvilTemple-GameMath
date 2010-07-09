@@ -5,7 +5,7 @@
 
 GAMEMATH_NAMESPACE_BEGIN
 
-class Quaternion {
+GAMEMATH_ALIGNEDTYPE_PRE class GAMEMATH_ALIGNEDTYPE_MID Quaternion : public AlignedAllocation {
 friend GAMEMATH_INLINE Quaternion operator +(const Quaternion &a, const Quaternion &b);
 friend GAMEMATH_INLINE Quaternion operator -(const Quaternion &a, const Quaternion &b);
 friend GAMEMATH_INLINE Quaternion operator *(const float, const Quaternion &vector);
@@ -127,45 +127,45 @@ public:
 private:
 
 #if !defined(GAMEMATH_NO_INTRINSICS)
-	union {
-		struct {
-			float mX;
-			float mY;
-			float mZ;
-			float mW;
-		};
-		__m128 mSse;
-	};
+        union {
+                struct {
+                        float mX;
+                        float mY;
+                        float mZ;
+                        float mW;
+                };
+                __m128 mSse;
+        };
 #else
-	float mX;
-	float mY;
-	float mZ;
-	float mW;
+        float mX;
+        float mY;
+        float mZ;
+        float mW;
 #endif // GAMEMATH_NO_INTRINSICS
-};
+} GAMEMATH_ALIGNEDTYPE_POST;
 
 GAMEMATH_INLINE Quaternion::Quaternion()
 {
 }
 
-GAMEMATH_INLINE float Quaternion::x() const 
+GAMEMATH_INLINE float Quaternion::x() const
 {
-	return mX;
+        return mX;
 }
 
-GAMEMATH_INLINE float Quaternion::y() const 
+GAMEMATH_INLINE float Quaternion::y() const
 {
-	return mY;
+        return mY;
 }
 
-GAMEMATH_INLINE float Quaternion::z() const 
+GAMEMATH_INLINE float Quaternion::z() const
 {
-	return mZ;
+        return mZ;
 }
 
-GAMEMATH_INLINE float Quaternion::w() const 
+GAMEMATH_INLINE float Quaternion::w() const
 {
-	return mW;
+        return mW;
 }
 
 GAMEMATH_INLINE void Quaternion::setX(float x)
@@ -190,11 +190,11 @@ GAMEMATH_INLINE void Quaternion::setW(float w)
 
 GAMEMATH_INLINE const float *Quaternion::data() const
 {
-	return &mX;
+        return &mX;
 }
 
 GAMEMATH_INLINE float *Quaternion::data() {
-	return &mX;
+        return &mX;
 }
 
 GAMEMATH_NAMESPACE_END

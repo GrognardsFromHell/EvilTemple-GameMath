@@ -10,72 +10,72 @@ GAMEMATH_NAMESPACE_BEGIN
 /**
  * Represents a two-dimensional box.
  */
-GAMEMATH_ALIGNEDTYPE_PRE class GAMEMATH_ALIGNEDTYPE_MID Box2d {
+GAMEMATH_ALIGNEDTYPE_PRE class GAMEMATH_ALIGNEDTYPE_MID Box2d : public AlignedAllocation {
 public:
-	/**
-	 * Constructs a two-dimensional box from its bounds.
-	 *
-	 * Arguments are automatically swapped to ensure left<right and top<bottom.
-	 */
-	Box2d(float left, float top, float right, float bottom);
+        /**
+         * Constructs a two-dimensional box from its bounds.
+         *
+         * Arguments are automatically swapped to ensure left<right and top<bottom.
+         */
+        Box2d(float left, float top, float right, float bottom);
 
-	float left() const;
-	float top() const;
-	float right() const;
-	float bottom() const;
+        float left() const;
+        float top() const;
+        float right() const;
+        float bottom() const;
 
-	/**
-	 * Determines whether this box intersects with another two-dimensional box.
-	 *
-	 * Two boxes intersect each other when their surface intersects.
-	 */
-	bool intersects(const Box2d &other) const;
+        /**
+         * Determines whether this box intersects with another two-dimensional box.
+         *
+         * Two boxes intersect each other when their surface intersects.
+         */
+        bool intersects(const Box2d &other) const;
 
 private:
-	float mLeft;
-	float mTop;
-	float mRight;
-	float mBottom;
+        float mLeft;
+        float mTop;
+        float mRight;
+        float mBottom;
 } GAMEMATH_ALIGNEDTYPE_POST;
 
 GAMEMATH_INLINE Box2d::Box2d(float left, float top, float right, float bottom)
-	: mLeft(left), mTop(top), mRight(right), mBottom(bottom)
+        : mLeft(left), mTop(top), mRight(right), mBottom(bottom)
 {
-	// Auto-Swap left/right
-	if (mRight < mLeft) {
-		std::swap(mRight, mLeft);
-	}
-	if (mBottom < mTop) {
-		std::swap(mBottom, mTop);
-	}
+        // Auto-Swap left/right
+        if (mRight < mLeft) {
+                std::swap(mRight, mLeft);
+        }
+        if (mBottom < mTop) {
+                std::swap(mBottom, mTop);
+        }
 }
 
 GAMEMATH_INLINE bool Box2d::intersects(const Box2d &other) const
 {
-	return !(other.mRight <= mLeft
-		|| other.mBottom <= mTop
-		|| other.mLeft >= mRight
-		|| other.mTop >= mBottom);
+        return !(other.mRight <= mLeft
+                || other.mBottom <= mTop
+                || other.mLeft >= mRight
+                || other.mTop >= mBottom);
 }
 
 GAMEMATH_INLINE float Box2d::left() const
 {
-	return mLeft;
+        return mLeft;
 }
 
 GAMEMATH_INLINE float Box2d::top() const
 {
-	return mTop;
+        return mTop;
 }
 
 GAMEMATH_INLINE float Box2d::right() const
 {
-	return mRight;
+        return mRight;
 }
 
 GAMEMATH_INLINE float Box2d::bottom() const
 {
-	return mBottom;
+        return mBottom;
 }
 
 GAMEMATH_NAMESPACE_END
