@@ -8,7 +8,7 @@
 
 GAMEMATH_NAMESPACE_BEGIN
 
-class Box3d {
+class Box3d : public AlignedAllocation {
 public:
     Box3d(const Vector4 &minimum, const Vector4 &maximum);
     Box3d();
